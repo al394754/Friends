@@ -1,6 +1,5 @@
 package com.example.friends;
 
-
 // Copyright 2020 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +13,7 @@ package com.example.friends;
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 
         import android.Manifest.permission;
         import android.annotation.SuppressLint;
@@ -97,6 +97,7 @@ public class MapsActivity extends AppCompatActivity
 
         // 2. Otherwise, request location permissions from the user.
         this.requestPermissions(new String[]{permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION}, 1001);
+        // [END maps_check_location_permission]
     }
 
     @Override
@@ -112,6 +113,7 @@ public class MapsActivity extends AppCompatActivity
         Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
 
+    // [START maps_check_location_permission_result]
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -128,10 +130,13 @@ public class MapsActivity extends AppCompatActivity
             enableMyLocation();
         } else {
             // Permission was denied. Display an error message
+            // [START_EXCLUDE]
             // Display the missing permission error dialog when the fragments resume.
             permissionDenied = true;
+            // [END_EXCLUDE]
         }
     }
+    // [END maps_check_location_permission_result]
 
     @Override
     protected void onResumeFragments() {
@@ -143,12 +148,13 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
-    /**
+    /*
      * Displays a dialog with error message explaining that the location permission is missing.
      */
-    /*private void showMissingPermissionError() {
+        /*private void showMissingPermissionError() {
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }*/
+
 
 }
