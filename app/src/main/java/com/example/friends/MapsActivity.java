@@ -15,24 +15,40 @@ package com.example.friends;
 // limitations under the License.
 
 
-        import android.Manifest.permission;
-        import android.annotation.SuppressLint;
-        import com.google.android.gms.maps.GoogleMap;
-        import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
-        import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
-        import com.google.android.gms.maps.OnMapReadyCallback;
-        import com.google.android.gms.maps.SupportMapFragment;
+import android.Manifest.permission;
+import android.annotation.SuppressLint;
 
-        import android.Manifest;
-        import android.content.pm.PackageManager;
-        import android.location.Location;
-        import android.os.Bundle;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.tasks.Task;
 
-        import androidx.annotation.NonNull;
-        import androidx.appcompat.app.AppCompatActivity;
-        import androidx.core.app.ActivityCompat;
-        import androidx.core.content.ContextCompat;
-        import android.widget.Toast;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.Priority;
+import com.google.android.gms.location.SettingsClient;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.util.Log;
+import android.widget.Toast;
 
 /**
  * This demo shows how GMS Location can be used to check for changes to the users location.  The "My
@@ -54,52 +70,38 @@ public class MapsActivity extends AppCompatActivity
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
     /**
      * Flag indicating whether a requested permission has been denied after returning in {@link
      * #onRequestPermissionsResult(int, String[], int[])}.
      */
-    private boolean permissionDenied = false;
-
+    private SupportMapFragment mapFragment;
     private GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        askPermissions();
+    }
 
-        SupportMapFragment mapFragment =
+    /**
+     * Method executed when all permission are obtained
+     */
+    private void initiate(){
+        mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-
+    
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
-        enableMyLocation();
+        map.setMyLocationEnabled(true);
     }
-
-    /**
-     * Enables the My Location layer if the fine location permission has been granted.
-     */
-    @SuppressLint("MissingPermission")
-    private void enableMyLocation() {
-        // 1. Check if permissions are granted, if so, enable the my location layer
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            map.setMyLocationEnabled(true);
-            return;
-        }
-
-        // 2. Otherwise, request location permissions from the user.
-        this.requestPermissions(new String[]{permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION}, 1001);
-        // [END maps_check_location_permission]
-    }
-
+    
     @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
@@ -112,8 +114,49 @@ public class MapsActivity extends AppCompatActivity
     public void onMyLocationClick(@NonNull Location location) {
         Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
+    
 
-    // [START maps_check_location_permission_result]
+//    @Override
+//    protected void onResumeFragments() {
+//        super.onResumeFragments();
+//        if (permissionDenied) {
+//            // Permission was not granted, display error dialog.
+//            //showMissingPermissionError();
+//            permissionDenied = false;
+//        }
+//    }
+
+    /*
+     * Displays a dialog with error message explaining that the location permission is missing.
+     */
+        /*private void showMissingPermissionError() {
+        PermissionUtils.PermissionDeniedDialog
+                .newInstance(true).show(getSupportFragmentManager(), "dialog");
+    }*/
+    /**
+     * Ask the user for permissions needed
+     */
+    private void askPermissions() {
+        // 1. Check if permissions are granted, if so, enable the my location layer
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationChecker();
+            return;
+        }
+
+        // 2. Otherwise, request location permissions from the user.
+        this.requestPermissions(new String[]{permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        // [END maps_check_location_permission]
+    }
+
+    /**
+     * Callback for requestPermissions
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -126,35 +169,69 @@ public class MapsActivity extends AppCompatActivity
                 == PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            // Enable the my location layer if the permission has been granted.
-            enableMyLocation();
+            // Enable the my location layer if the permission has been granted
+            locationChecker();
         } else {
-            // Permission was denied. Display an error message
-            // [START_EXCLUDE]
             // Display the missing permission error dialog when the fragments resume.
-            permissionDenied = true;
-            // [END_EXCLUDE]
-        }
-    }
-    // [END maps_check_location_permission_result]
-
-    @Override
-    protected void onResumeFragments() {
-        super.onResumeFragments();
-        if (permissionDenied) {
-            // Permission was not granted, display error dialog.
             //showMissingPermissionError();
-            permissionDenied = false;
+            finish();
         }
     }
-
-    /*
-     * Displays a dialog with error message explaining that the location permission is missing.
+    /**
+     * Este método crea una solicitud de ubicación con ciertos parámetros, después de ello compara
+     * el estado actual de la ubicación con la solicitud de ubicación. Si todos los requisitos de la
+     * solicitud se cumplen la comparación es exitosa, por tanto sigue la ejecucción de código. Si no
+     * significa probablemente que la ubicación está desactivada y se crea una petición al usuario
+     * para que la active.
      */
-        /*private void showMissingPermissionError() {
-        PermissionUtils.PermissionDeniedDialog
-                .newInstance(true).show(getSupportFragmentManager(), "dialog");
-    }*/
-
-
+    
+    @SuppressLint({"NewApi", "MissingPermission"})
+    protected void locationChecker() {
+        LocationRequest.Builder locationRequestBuilder = new LocationRequest.Builder(10000);
+        locationRequestBuilder.setMinUpdateIntervalMillis(5000);
+        locationRequestBuilder.setPriority(Priority.PRIORITY_LOW_POWER);
+        LocationRequest locationRequest = locationRequestBuilder.build();
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this, locationSettingsResponse -> {
+            Log.d("RequestLocation","Success");
+            initiate();
+        });
+        task.addOnFailureListener(this, e -> {
+            Log.d("Request","Location");
+            if (e instanceof ApiException) {
+                try {
+                    ApiException resolvable = (ApiException) e;
+                    Status status = resolvable.getStatus();
+                    status.startResolutionForResult(this,
+                            LOCATION_PERMISSION_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException ignored) {}
+            }
+        });
+    }
+    /**
+     * Callback of startResolutionForResult
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @SuppressLint("MissingPermission")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST_CODE)
+            super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode){
+            case LOCATION_PERMISSION_REQUEST_CODE:
+                if(resultCode == RESULT_OK) {
+                    Log.d("RequestLocation","User Enabled Location");
+                    initiate();
+                } else {
+                    Log.d("RequestLocation","User did not enable Location");
+                    //showMissingPermissionError();
+                    finish();
+                }
+        }
+    }
 }
