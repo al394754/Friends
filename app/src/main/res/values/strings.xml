@@ -9,10 +9,10 @@
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="permission_rationale">"Permission fail"</string>
-    <string name="error_invalid_password">\"Invalid password\"</string>
-    <string name="error_field_required">\"Invalid field\"</string>
-    <string name="error_invalid_email">\"Invalid email\"</string>
-    <string name="error_incorrect_password">\"Error incorect password\"</string>
+    <string name="login_failed">Login failed</string>
+    <string name="permission_rationale">Permission fail</string>
+    <string name="error_invalid_password">The password must have at least 5 of length</string>
+    <string name="error_field_required">Do not leave empty fields</string>
+    <string name="error_invalid_email">Invalid email</string>
+    <string name="error_incorrect_password">Error incorrect email/password</string>
 </resources>
