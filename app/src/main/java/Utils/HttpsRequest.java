@@ -19,6 +19,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class HttpsRequest {
     //TODO: Alex escribe los metodos que necesitos y me encargo yo de hacer la petición
     private static final String URL_DB="https://script.google.com/macros/s/AKfycbwRoz_VM-6332p4laOoGD1WIxmOMnhxRwZI6Lm3ensG5bHkLpV2n8CWAnLo6I6Gklg0jg/exec";
+    private static final String id="AKfycbwRoz_VM-6332p4laOoGD1WIxmOMnhxRwZI6Lm3ensG5bHkLpV2n8CWAnLo6I6Gklg0jg";
     private StringBuilder url;
     private HttpsURLConnection con;
     public HttpsRequest(String Url) throws MalformedURLException {
@@ -52,6 +53,7 @@ public class HttpsRequest {
         return object.getBoolean("ValidRegister");
     }
     public boolean createGETRequest(Map<String,String> parameters) throws IOException {
+        parameters.put("ID",id);
         url.append(ParameterStringBuilder.getParamsString(parameters));
         URL urlObj= new URL(url.toString());
         Log.d("URL: ", url.toString());
@@ -63,6 +65,7 @@ public class HttpsRequest {
         return true;
     }
     public boolean createPOSTRequest(Map<String,String> parameters) throws IOException {
+        parameters.put("ID",id);
         url.append(ParameterStringBuilder.getParamsString(parameters));
         URL urlObj= new URL(url.toString());
         Log.d("URL: ", url.toString());
