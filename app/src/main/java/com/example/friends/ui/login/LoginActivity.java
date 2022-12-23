@@ -40,7 +40,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONException;
 
 import Utils.AESCrypt;
-import Utils.HttpRequest;
+import Utils.HttpsRequest;
 
 /**
  * A login screen that offers login via email/password.
@@ -309,7 +309,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 e.printStackTrace();
                         }
                         try {
-                                boolean logged = HttpRequest.loginRequest(mEmail,passwordEncrypted);
+                                boolean logged = HttpsRequest.loginRequest(mEmail,passwordEncrypted);
                                 if (logged)
                                         return true;
                         } catch (JSONException | IOException e) {

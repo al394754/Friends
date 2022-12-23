@@ -8,24 +8,25 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class HttpRequest {
+import javax.net.ssl.HttpsURLConnection;
+
+public class HttpsRequest {
     //TODO: Alex escribe los metodos que necesitos y me encargo yo de hacer la petición
     private static final String URL_DB="https://script.google.com/macros/s/AKfycbwRoz_VM-6332p4laOoGD1WIxmOMnhxRwZI6Lm3ensG5bHkLpV2n8CWAnLo6I6Gklg0jg/exec";
     private StringBuilder url;
-    private HttpURLConnection con;
-    public HttpRequest(String Url) throws MalformedURLException {
+    private HttpsURLConnection con;
+    public HttpsRequest(String Url) throws MalformedURLException {
         super();
         this.url=new StringBuilder(Url);
     }
     public static boolean loginRequest(String email, String password) throws IOException, JSONException {
-        HttpRequest httpRequest = new HttpRequest(URL_DB);
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","LOGIN");
         parameters.put("EMAIL",email);
@@ -37,7 +38,7 @@ public class HttpRequest {
         return object.getBoolean("ValidLogin");
     }
     public static boolean registerRequest(String email,String password,String name,String surname) throws IOException, JSONException {
-        HttpRequest httpRequest = new HttpRequest(URL_DB);
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","REGISTER");
         parameters.put("EMAIL",email);
@@ -54,7 +55,7 @@ public class HttpRequest {
         url.append(ParameterStringBuilder.getParamsString(parameters));
         URL urlObj= new URL(url.toString());
         Log.d("URL: ", url.toString());
-        con = (HttpURLConnection) urlObj.openConnection();
+        con = (HttpsURLConnection) urlObj.openConnection();
         con.setRequestMethod("GET");
         con.setConnectTimeout(5000);
         con.setReadTimeout(5000);
@@ -65,7 +66,7 @@ public class HttpRequest {
         url.append(ParameterStringBuilder.getParamsString(parameters));
         URL urlObj= new URL(url.toString());
         Log.d("URL: ", url.toString());
-        con = (HttpURLConnection) urlObj.openConnection();
+        con = (HttpsURLConnection) urlObj.openConnection();
         con.setRequestMethod("POST");
         con.setConnectTimeout(5000);
         con.setReadTimeout(5000);

@@ -39,7 +39,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONException;
 
 import Utils.AESCrypt;
-import Utils.HttpRequest;
+import Utils.HttpsRequest;
 
 /**
  * A Register screen.
@@ -337,7 +337,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
             }
 
             try {
-                boolean registered = HttpRequest.registerRequest(mEmail,passwordEncrypted,mName,mSurname);
+                boolean registered = HttpsRequest.registerRequest(mEmail,passwordEncrypted,mName,mSurname);
                 return registered;
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
