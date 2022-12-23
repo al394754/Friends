@@ -32,7 +32,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.friends.MapsActivity;
+import com.example.friends.map.MapsActivity;
 import com.example.friends.R;
 import com.google.android.material.snackbar.Snackbar;
 

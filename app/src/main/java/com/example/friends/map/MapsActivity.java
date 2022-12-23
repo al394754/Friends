@@ -1,4 +1,4 @@
-package com.example.friends;
+package com.example.friends.map;
 
 // Copyright 2020 Google LLC
 //
@@ -18,6 +18,7 @@ package com.example.friends;
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 
+import com.example.friends.R;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
