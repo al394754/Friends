@@ -17,23 +17,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -45,7 +38,6 @@ import com.example.friends.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import Utils.AESCrypt;
 import Utils.HttpRequest;
@@ -54,19 +46,11 @@ import Utils.HttpRequest;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-        private final String URL_DB="https://script.google.com/macros/s/AKfycbwRoz_VM-6332p4laOoGD1WIxmOMnhxRwZI6Lm3ensG5bHkLpV2n8CWAnLo6I6Gklg0jg/exec";
         /**
          * Id to identity READ_CONTACTS permission request.
          */
         private static final int REQUEST_READ_CONTACTS = 0;
 
-        /**
-         * A dummy authentication store containing known user names and passwords.
-         * TODO: remove after connecting to a real authentication system.
-         */
-        private static final String[] DUMMY_CREDENTIALS = new String[]{
-        "alexManea@gmail.com:alex1", "bar@example.com:world"
-        };
         /**
          * Keep track of the login task to ensure we can cancel it if requested.
          */
@@ -87,23 +71,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-        @Override
-        public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+        mPasswordView.setOnEditorActionListener((textView, id, keyEvent) -> {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
                         attemptLogin();
                         return true;
                 }
                 return false;
-        }});
+        });
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-                attemptLogin();
-        }
-        });
+        Button mEmailSignUpButton = (Button) findViewById(R.id.email_sign_up_button);
+        mEmailSignInButton.setOnClickListener(view -> attemptLogin());
+        mEmailSignUpButton.setOnClickListener(view -> launchRegister());
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -206,8 +185,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
         }
 
+        private void launchRegister(){
+                Intent intent= new Intent(getApplicationContext(),RegisterActivity.class);
+                startActivity(intent);
+        }
         private boolean isEmailValid(String email) {
-                //TODO: Replace this with your own logic
                 return email.contains("@");
         }
 
@@ -326,51 +308,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         } catch (Exception e) {
                                 e.printStackTrace();
                         }
-                        // TODO: attempt authentication against a network service.
                         try {
-                                HttpRequest httpRequest = new HttpRequest(URL_DB);
-                                Map<String, String> parameters = new HashMap<>();
-                                parameters.put("ACTION","LOGIN");
-                                parameters.put("EMAIL",mEmail);
-                                parameters.put("PASSWORD",passwordEncrypted);
-                                httpRequest.createGETRequest(parameters);
-                                String JsonString = httpRequest.getResponse();
-                                Log.d("Response ",JsonString);
-                                JSONObject object = new JSONObject(JsonString);
-                                if (object.getBoolean("ValidLogin"))
+                                boolean logged = HttpRequest.loginRequest(mEmail,passwordEncrypted);
+                                if (logged)
                                         return true;
-                        } catch (MalformedURLException e) {
-                                e.printStackTrace();
-                        } catch (IOException e) {
-                                e.printStackTrace();
-                        } catch (JSONException e) {
+                        } catch (JSONException | IOException e) {
                                 e.printStackTrace();
                         }
 
-
-                        try {
-                                HttpRequest httpRequest = new HttpRequest(URL_DB);
-                                Map<String, String> parameters = new HashMap<>();
-                                parameters.put("ACTION","REGISTER");
-                                parameters.put("EMAIL",mEmail);
-                                parameters.put("PASSWORD",passwordEncrypted);
-                                parameters.put("NAME",mEmail);
-                                parameters.put("SURNAME",mEmail);
-                                httpRequest.createPOSTRequest(parameters);
-                                String JsonString = httpRequest.getResponse();
-                                Log.d("Response ",JsonString);
-                                JSONObject object = new JSONObject(JsonString);
-                                if (object.getBoolean("ValidRegister"))
-                                        return true;
-                        } catch (MalformedURLException e) {
-                                e.printStackTrace();
-                        } catch (IOException e) {
-                                e.printStackTrace();
-                        } catch (JSONException e) {
-                                e.printStackTrace();
-                        }
                         return false;
-                        }
+                }
 
                 @Override
                 protected void onPostExecute(final Boolean success) {
@@ -393,4 +340,3 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
         }
 }
-

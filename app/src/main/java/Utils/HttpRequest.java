@@ -2,21 +2,53 @@ package Utils;
 
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HttpRequest {
-    StringBuilder url;
-    HttpURLConnection con;
+    //TODO: Alex escribe los metodos que necesitos y me encargo yo de hacer la petición
+    private static final String URL_DB="https://script.google.com/macros/s/AKfycbwRoz_VM-6332p4laOoGD1WIxmOMnhxRwZI6Lm3ensG5bHkLpV2n8CWAnLo6I6Gklg0jg/exec";
+    private StringBuilder url;
+    private HttpURLConnection con;
     public HttpRequest(String Url) throws MalformedURLException {
         super();
         this.url=new StringBuilder(Url);
+    }
+    public static boolean loginRequest(String email, String password) throws IOException, JSONException {
+        HttpRequest httpRequest = new HttpRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","LOGIN");
+        parameters.put("EMAIL",email);
+        parameters.put("PASSWORD",password);
+        httpRequest.createGETRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getBoolean("ValidLogin");
+    }
+    public static boolean registerRequest(String email,String password,String name,String surname) throws IOException, JSONException {
+        HttpRequest httpRequest = new HttpRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","REGISTER");
+        parameters.put("EMAIL",email);
+        parameters.put("PASSWORD",password);
+        parameters.put("NAME",name);
+        parameters.put("SURNAME",surname);
+        httpRequest.createPOSTRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getBoolean("ValidRegister");
     }
     public boolean createGETRequest(Map<String,String> parameters) throws IOException {
         url.append(ParameterStringBuilder.getParamsString(parameters));
