@@ -33,6 +33,8 @@ import static android.Manifest.permission.READ_CONTACTS;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.friends.main_menu.MainMenuActivity;
+import com.example.friends.map.Friends;
 import com.example.friends.map.MapsActivity;
 import com.example.friends.R;
 import com.google.android.material.snackbar.Snackbar;
@@ -325,7 +327,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         showProgress(false);
 
                         if (success) {
-                                Intent intent= new Intent(getApplicationContext(),MapsActivity.class);
+                                Intent intent= new Intent(getApplicationContext(), MainMenuActivity.class);
                                 startActivity(intent);
                         } else {
                                 mPasswordView.setError(getString(R.string.error_incorrect_password));
