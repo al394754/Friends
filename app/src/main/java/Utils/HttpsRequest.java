@@ -54,6 +54,7 @@ public class HttpsRequest {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","UPDATECOORDINATES");
         parameters.put("EMAIL",email);
+        parameters.put("COORDINATES",coordinates);
         httpRequest.createPOSTRequest(parameters);
         String JsonString = httpRequest.getResponse();
         Log.d("Response ",JsonString);
