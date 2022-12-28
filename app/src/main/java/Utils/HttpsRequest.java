@@ -27,7 +27,7 @@ public class HttpsRequest {
         super();
         this.url=new StringBuilder(Url);
     }
-    public static List<String> getFriends(String email) throws IOException, JSONException {
+    public static String getFriends(String email) throws IOException, JSONException {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","GETFRIENDS");
@@ -36,7 +36,7 @@ public class HttpsRequest {
         String JsonString = httpRequest.getResponse();
         Log.d("Response ",JsonString);
         JSONObject object = new JSONObject(JsonString);
-        return (List<String>) object.getJSONArray("Friends");
+        return object.getJSONArray("Friends").toString(); //Lo paso a String ya que tenía problemas de conversión a lista
     }
     public static String getCoordinates(String email) throws IOException, JSONException {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);

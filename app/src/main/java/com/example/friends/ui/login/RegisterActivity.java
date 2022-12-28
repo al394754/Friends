@@ -353,6 +353,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
             if (success) {
                 Intent intent= new Intent(getApplicationContext(), MainMenuActivity.class);
+                intent.putExtra("EMAIL", mEmail);
                 startActivity(intent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

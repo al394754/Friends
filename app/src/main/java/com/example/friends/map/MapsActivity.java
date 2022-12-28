@@ -24,8 +24,11 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
+import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 
 import com.google.android.gms.location.LocationRequest;
@@ -40,6 +43,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -50,6 +54,15 @@ import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.widget.Toast;
+
+import org.json.JSONException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import Utils.HttpsRequest;
 
 /**
  * This demo shows how GMS Location can be used to check for changes to the users location.  The "My
@@ -68,6 +81,8 @@ public class MapsActivity extends AppCompatActivity
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private SupportMapFragment mapFragment;
     private GoogleMap map;
+    private LatLng coordinates = null;
+    private AccessCoordinates accessCoordinates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,13 +94,13 @@ public class MapsActivity extends AppCompatActivity
     /**
      * Method executed when all permission are obtained
      */
-    private void initiate(){
+    private void initiate() {
         mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
     }
-    
+
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -93,8 +108,11 @@ public class MapsActivity extends AppCompatActivity
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
         map.setMyLocationEnabled(true);
+        accessCoordinates = new AccessCoordinates("Alex@gmail.com");
+        accessCoordinates.execute((Void) null);
+
     }
-    
+
     @Override
     public boolean onMyLocationButtonClick() {
         Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
@@ -107,7 +125,7 @@ public class MapsActivity extends AppCompatActivity
     public void onMyLocationClick(@NonNull Location location) {
         Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
-    
+
 
 //    @Override
 //    protected void onResumeFragments() {
@@ -126,6 +144,7 @@ public class MapsActivity extends AppCompatActivity
         PermissionUtils.PermissionDeniedDialog
                 .newInstance(true).show(getSupportFragmentManager(), "dialog");
     }*/
+
     /**
      * Ask the user for permissions needed
      */
@@ -146,6 +165,7 @@ public class MapsActivity extends AppCompatActivity
 
     /**
      * Callback for requestPermissions
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
@@ -170,6 +190,7 @@ public class MapsActivity extends AppCompatActivity
             finish();
         }
     }
+
     /**
      * Este método crea una solicitud de ubicación con ciertos parámetros, después de ello compara
      * el estado actual de la ubicación con la solicitud de ubicación. Si todos los requisitos de la
@@ -177,7 +198,7 @@ public class MapsActivity extends AppCompatActivity
      * significa probablemente que la ubicación está desactivada y se crea una petición al usuario
      * para que la active.
      */
-    
+
     @SuppressLint({"NewApi", "MissingPermission"})
     protected void locationChecker() {
         LocationRequest.Builder locationRequestBuilder = new LocationRequest.Builder(10000);
@@ -189,23 +210,26 @@ public class MapsActivity extends AppCompatActivity
         SettingsClient client = LocationServices.getSettingsClient(this);
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
         task.addOnSuccessListener(this, locationSettingsResponse -> {
-            Log.d("RequestLocation","Success");
+            Log.d("RequestLocation", "Success");
             initiate();
         });
         task.addOnFailureListener(this, e -> {
-            Log.d("Request","Location");
+            Log.d("Request", "Location");
             if (e instanceof ApiException) {
                 try {
                     ApiException resolvable = (ApiException) e;
                     Status status = resolvable.getStatus();
                     status.startResolutionForResult(this,
                             LOCATION_PERMISSION_REQUEST_CODE);
-                } catch (IntentSender.SendIntentException ignored) {}
+                } catch (IntentSender.SendIntentException ignored) {
+                }
             }
         });
     }
+
     /**
      * Callback of startResolutionForResult
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -215,16 +239,60 @@ public class MapsActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode != LOCATION_PERMISSION_REQUEST_CODE)
             super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case LOCATION_PERMISSION_REQUEST_CODE:
-                if(resultCode == RESULT_OK) {
-                    Log.d("RequestLocation","User Enabled Location");
+                if (resultCode == RESULT_OK) {
+                    Log.d("RequestLocation", "User Enabled Location");
                     initiate();
                 } else {
-                    Log.d("RequestLocation","User did not enable Location");
+                    Log.d("RequestLocation", "User did not enable Location");
                     //showMissingPermissionError();
                     finish();
                 }
         }
+    }
+
+    public class AccessCoordinates extends AsyncTask<Void, Void, Boolean> {
+
+        private String email;
+        private String cadena;
+
+        AccessCoordinates(String email) {
+            this.email = email;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+
+            try {
+                cadena = HttpsRequest.getCoordinates(email);
+                //HttpsRequest.updateCoordinates("Alex@gmail.com", map.getMyLocation().toString()); //Actualizar mi propia ubicación
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+            System.out.println(cadena);
+            //amigos.addAll(Arrays.asList(cadena.replace("[", "").replace("]", "").replace("\"", "").split(","))); //pasar la cadena que obtenemos a lista
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            accessCoordinates = null;
+            if (success)
+                creaCoordenadas(cadena);
+            else
+                System.out.println("Error coordenadas");
+
+        }
+    }
+
+    private void creaCoordenadas(String coordenadas) {
+        String[] param = coordenadas.split(":");
+        coordinates = new LatLng(Double.parseDouble(param[0]), Double.parseDouble(param[1])); //Latitud : Longitud
+        map.addMarker(new MarkerOptions().position(coordinates).title("Posicion")); //Añadimos un marcador sobre la posicion de una persona    }
     }
 }

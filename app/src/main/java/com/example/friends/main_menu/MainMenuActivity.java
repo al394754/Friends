@@ -47,7 +47,8 @@ import Utils.HttpsRequest;
 
 public class MainMenuActivity extends AppCompatActivity{
 
-    //TODO Comprobación de buen inicio de sesión
+    //private String email = getIntent().getStringExtra("EMAIL");//Con esto obtenemos el email del login, debemos pasarlo al resto de actividades manualmente
+    private String email = "Alex@gmail.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,7 @@ public class MainMenuActivity extends AppCompatActivity{
 
     public void showFriends(){ //Muestra una lista de amigos cada uno con dos botones, uno para chat y otro para ubicación
         Intent intent = new Intent(getApplicationContext(), Friends.class);
+        intent.putExtra("EMAIL", email);
         startActivity(intent);
     }
 
