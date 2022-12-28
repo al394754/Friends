@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,39 @@ public class HttpsRequest {
     public HttpsRequest(String Url) throws MalformedURLException {
         super();
         this.url=new StringBuilder(Url);
+    }
+    public static List<String> getFriends(String email) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","GETFRIENDS");
+        parameters.put("EMAIL",email);
+        httpRequest.createGETRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return (List<String>) object.getJSONArray("Friends");
+    }
+    public static String getCoordinates(String email) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","GETCOORDINATES");
+        parameters.put("EMAIL",email);
+        httpRequest.createGETRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getString("Coordinates");
+    }
+    public static boolean updateCoordinates(String email,String coordinates) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","UPDATECOORDINATES");
+        parameters.put("EMAIL",email);
+        httpRequest.createPOSTRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getBoolean("ValidUpdate");
     }
     public static boolean loginRequest(String email, String password) throws IOException, JSONException {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
