@@ -33,6 +33,7 @@ import static android.Manifest.permission.READ_CONTACTS;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.friends.map.Chat;
 import com.example.friends.map.Friends;
 import com.example.friends.map.MapsActivity;
 import com.example.friends.R;
@@ -47,14 +48,20 @@ import Utils.HttpsRequest;
 
 public class MainMenuActivity extends AppCompatActivity{
 
-    //private String email = getIntent().getStringExtra("EMAIL");//Con esto obtenemos el email del login, debemos pasarlo al resto de actividades manualmente
-    private String email = "Alex@gmail.com";
+//    private String email = getIntent().getStringExtra("EMAIL");//Con esto obtenemos el email del login, debemos pasarlo al resto de actividades manualmente
+    //private String email = "Alex@gmail.com";
+    private String email = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);//poner la página en pantalla
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null){
+            email = extras.getString("EMAIL");
+        }
 
         Button friendsButton = (Button) findViewById(R.id.friends_button); //Lista de amigos
         Button socialButton = (Button) findViewById(R.id.social_button); //Peticiones de amistad
@@ -77,7 +84,9 @@ public class MainMenuActivity extends AppCompatActivity{
     }
 
     public void showMap(){ //Muestra el mapa pero solo de la ubicaciónd el propio usuario, no del resto (Función básica de Google Maps)
-        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        Intent intent = new Intent(getApplicationContext(), Chat.class);
+        intent.putExtra("EMAIL", email);
+        intent.putExtra("EMAIL_AMIGO", "alexManea@gmail.com");
         startActivity(intent);
     }
 

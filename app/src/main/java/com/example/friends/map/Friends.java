@@ -1,5 +1,6 @@
 package com.example.friends.map;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
@@ -24,6 +25,7 @@ public class Friends extends AppCompatActivity{
     private String emailPersonal;
     private AccessFriends access = null;
     private ListView listado;
+    private FriendsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class Friends extends AppCompatActivity{
         emailPersonal = "alexManea@gmail.com";
 
         listado = (ListView) findViewById(R.id.listView);
+
+        //adapter = new FriendsAdapter(emailPersonal, amigos, getApplicationContext());
 
         //emailPersonal = getIntent().getStringExtra("EMAIL");
         access = new AccessFriends(emailPersonal);
@@ -44,6 +48,7 @@ public class Friends extends AppCompatActivity{
         private final String email;
         private String cadena;
         private ArrayList<String> amigos = new ArrayList<String>();
+        private String correoAmigo;
 
         AccessFriends(String email){
             this.email = email;
@@ -67,11 +72,46 @@ public class Friends extends AppCompatActivity{
         protected void onPostExecute(final Boolean success){
             access = null;
             if(success){
-                listado.setAdapter(new FriendsAdapter(amigos, getApplicationContext()));
+                adapter = new FriendsAdapter(emailPersonal, amigos, getApplicationContext());
+                listado.setAdapter(adapter);
             }else{
                 System.out.println("Error");
             }
         }
+
+        public void seleccionarOpcion() {
+            int botonSeleccionado = -1;
+            while (true) {
+                botonSeleccionado = adapter.getOpcion();
+                if (botonSeleccionado != -1)
+                    break;
+            }
+            switch (botonSeleccionado) {
+                case 0:
+                    abrirChat(emailPersonal);
+                    break;
+                case 1:
+                    abrirMapa(emailPersonal);
+                    break;
+            }
+        }
+
+        public void abrirMapa(String emailPropio){
+            correoAmigo = FriendsAdapter.getCorreoAmigo();
+            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+            intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
+            intent.putExtra("EMAIL_AMIGO", correoAmigo);
+            startActivity(intent);
+        }
+
+        public void abrirChat(String emailPropio){
+            correoAmigo = FriendsAdapter.getCorreoAmigo();
+            Intent intent = new Intent(getApplicationContext(), Chat.class);
+            intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
+            intent.putExtra("EMAIL_AMIGO", correoAmigo);
+            startActivity(intent);
+        }
+
     }
 
 

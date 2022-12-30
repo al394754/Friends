@@ -53,6 +53,8 @@
             android:exported="true"></activity>
         <activity android:name=".map.Friends"
             android:exported="true"></activity>
+        <activity android:name=".map.Chat"
+            android:exported="true"></activity>
     </application>
 
 </manifest>

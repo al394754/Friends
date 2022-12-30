@@ -24,7 +24,6 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationClickListener;
-import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -42,7 +41,9 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -58,9 +59,6 @@ import android.widget.Toast;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import Utils.HttpsRequest;
 
@@ -81,8 +79,11 @@ public class MapsActivity extends AppCompatActivity
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private SupportMapFragment mapFragment;
     private GoogleMap map;
-    private LatLng coordinates = null;
-    private AccessCoordinates accessCoordinates;
+    private String emailPropio; //Email del propio usuario
+    private String emailAjeno; //Email de amigo
+    private LatLng coordinatesOtro = null; //Coordenadas dde amigo
+    private LatLng coordenadasActuales; //Con esto actualizaremos nuestra posicion actual
+    private AccessCoordinates accessCoordinates; //Utilizar para obtener coordenadas
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,9 +109,23 @@ public class MapsActivity extends AppCompatActivity
         map.setOnMyLocationButtonClickListener(this);
         map.setOnMyLocationClickListener(this);
         map.setMyLocationEnabled(true);
-        accessCoordinates = new AccessCoordinates("Alex@gmail.com");
-        accessCoordinates.execute((Void) null);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null){
+            emailPropio = extras.getString("EMAIL");
+            if(extras.size() > 1){
+                emailAjeno = extras.getString("EMAIL_AMIGO");
+            }
+        }
+
+        LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        String provider = service.getBestProvider(criteria, false);
+        Location location = service.getLastKnownLocation(provider);
+        coordenadasActuales = new LatLng(location.getLatitude(),location.getLongitude()); //Código para obtener ubicación actual
+
+        accessCoordinates = new AccessCoordinates(emailAjeno);
+        accessCoordinates.execute((Void) null);
     }
 
     @Override
@@ -254,19 +269,22 @@ public class MapsActivity extends AppCompatActivity
 
     public class AccessCoordinates extends AsyncTask<Void, Void, Boolean> {
 
-        private String email;
-        private String cadena;
+        private String emailAmigo;
+        private String cadena = "";
 
         AccessCoordinates(String email) {
-            this.email = email;
+            this.emailAmigo = email;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
 
             try {
-                cadena = HttpsRequest.getCoordinates(email);
-                //HttpsRequest.updateCoordinates("Alex@gmail.com", map.getMyLocation().toString()); //Actualizar mi propia ubicación
+                if(emailAmigo != null) {
+                    cadena = HttpsRequest.getCoordinates(emailAmigo);
+                }
+                String misNuevasCoordenadas = coordenadasActuales.toString().replace("lat/lng: (", "").replace(")", "").replace(",", ":");
+                HttpsRequest.updateCoordinates(emailPropio, misNuevasCoordenadas);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -274,7 +292,7 @@ public class MapsActivity extends AppCompatActivity
                 e.printStackTrace();
                 return false;
             }
-            System.out.println(cadena);
+            //System.out.println(cadena);
             //amigos.addAll(Arrays.asList(cadena.replace("[", "").replace("]", "").replace("\"", "").split(","))); //pasar la cadena que obtenemos a lista
             return true;
         }
@@ -282,17 +300,16 @@ public class MapsActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(final Boolean success) {
             accessCoordinates = null;
-            if (success)
+            if (success && cadena.compareTo("") != 0) //Segunda condicion comprueba si hay algún email de amigo
                 creaCoordenadas(cadena);
             else
                 System.out.println("Error coordenadas");
-
         }
     }
 
     private void creaCoordenadas(String coordenadas) {
         String[] param = coordenadas.split(":");
-        coordinates = new LatLng(Double.parseDouble(param[0]), Double.parseDouble(param[1])); //Latitud : Longitud
-        map.addMarker(new MarkerOptions().position(coordinates).title("Posicion")); //Añadimos un marcador sobre la posicion de una persona    }
+        coordinatesOtro = new LatLng(Double.parseDouble(param[0]), Double.parseDouble(param[1])); //Latitud : Longitud
+        map.addMarker(new MarkerOptions().position(coordinatesOtro).title("Posicion")); //Añadimos un marcador sobre la posicion de una persona    }
     }
 }

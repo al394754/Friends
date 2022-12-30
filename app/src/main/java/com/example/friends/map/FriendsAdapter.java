@@ -1,7 +1,10 @@
 package com.example.friends.map;
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +13,27 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.friends.R;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import Utils.HttpsRequest;
 
 public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase para poder realizar el listado de amigos con botones
-    private ArrayList<String> amigos = new ArrayList<String>();
+    private ArrayList<String> amigos = new ArrayList<String>(); //Listado de amigos
     private Context context;
+    private static String correoAmigo; //Correo que usaremos para ubicar a nuestro amigo
+    private String emailPropio; //Correo personal
+    private int opcion = -1; //Variable para decidir cual de los dos botones se ha presionado
 
-    public FriendsAdapter(ArrayList<String> amigos, Context context){
+    public FriendsAdapter(String emailPropio, ArrayList<String> amigos, Context context){
+        this.emailPropio = emailPropio;
         this.amigos = amigos;
         this.context = context;
     }
@@ -40,7 +55,6 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
 
     @Override
     public View getView(int pos, View view, ViewGroup viewGroup) {
-        System.out.println(amigos);
         if (view == null){
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.activity_friends_fila, null);
@@ -49,12 +63,14 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         TextView amigo = (TextView) view.findViewById(R.id.amigo);
         amigo.setText(amigos.get(pos));
 
+        correoAmigo = amigos.get(pos);
+
         Button chat = (Button) view.findViewById(R.id.chat);
 
         chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO abrir chat
+                opcion = 0;
             }
         });
 
@@ -63,8 +79,15 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO abrir mapa con persona
+                opcion = 1;
             }
         });return view;
     }
+
+    public static String getCorreoAmigo(){
+        return correoAmigo;
+    }
+
+    public int getOpcion(){ return opcion; }
+
 }
