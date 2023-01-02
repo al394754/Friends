@@ -84,7 +84,7 @@ public class MainMenuActivity extends AppCompatActivity{
     }
 
     public void showMap(){ //Muestra el mapa pero solo de la ubicaciónd el propio usuario, no del resto (Función básica de Google Maps)
-        Intent intent = new Intent(getApplicationContext(), Chat.class);
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
         intent.putExtra("EMAIL", email);
         intent.putExtra("EMAIL_AMIGO", "alexManea@gmail.com");
         startActivity(intent);

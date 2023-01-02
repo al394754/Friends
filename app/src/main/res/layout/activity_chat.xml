@@ -5,29 +5,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/chatLocal"
-        android:layout_width="309dp"
-        android:layout_height="364dp"
-        android:layout_marginStart="51dp"
-        android:layout_marginTop="58dp"
-        android:layout_marginEnd="46dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="310dp"
+        android:layout_height="365dp"
+        tools:layout_editor_absoluteX="57dp"
+        tools:layout_editor_absoluteY="61dp">
+
+        <TextView
+            android:id="@+id/chatLocal"
+            android:layout_width="309dp"
+            android:layout_height="364dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="30dp"
+            android:text="TextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </ScrollView>
 
     <EditText
         android:id="@+id/entrada"
         android:layout_width="315dp"
         android:layout_height="62dp"
-        android:layout_marginStart="51dp"
-        android:layout_marginEnd="45dp"
+        android:layout_marginStart="52dp"
+        android:layout_marginEnd="44dp"
         android:ems="10"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatLocal" />
+        app:layout_constraintTop_toBottomOf="@+id/scrollView2" />
 
     <Button
         android:id="@+id/enviar"

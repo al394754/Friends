@@ -66,28 +66,14 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         correoAmigo = amigos.get(pos);
 
         Button chat = (Button) view.findViewById(R.id.chat);
-
-        chat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                opcion = 0;
-            }
-        });
-
         Button map = (Button) view.findViewById(R.id.map_friend);
 
-        map.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                opcion = 1;
-            }
-        });return view;
+        return view;
     }
 
     public static String getCorreoAmigo(){
         return correoAmigo;
     }
 
-    public int getOpcion(){ return opcion; }
 
 }

@@ -1,16 +1,24 @@
 package com.example.friends.map;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.friends.R;
 
@@ -23,6 +31,7 @@ public class Friends extends AppCompatActivity{
 
     private ArrayList<String> amigos = new ArrayList<String>(); //Listado de todos los amigos
     private String emailPersonal;
+    private String correoAmigo;
     private AccessFriends access = null;
     private ListView listado;
     private FriendsAdapter adapter;
@@ -39,20 +48,36 @@ public class Friends extends AppCompatActivity{
         //adapter = new FriendsAdapter(emailPersonal, amigos, getApplicationContext());
 
         //emailPersonal = getIntent().getStringExtra("EMAIL");
-        access = new AccessFriends(emailPersonal);
+        access = new AccessFriends();
         access.execute((Void) null);
 
     }
+
+    public void onClickFriendMapButton(View view){ abrirMapa(emailPersonal); }
+    public void onClickChatButton(View view){ abrirChat(emailPersonal); }
+
+
+    public void abrirMapa(String emailPropio){
+        correoAmigo = FriendsAdapter.getCorreoAmigo();
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
+        intent.putExtra("EMAIL_AMIGO", correoAmigo);
+        startActivity(intent);
+    }
+
+    public void abrirChat(String emailPropio){
+        correoAmigo = FriendsAdapter.getCorreoAmigo();
+        Intent intent = new Intent(getApplicationContext(), Chat.class);
+        intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
+        intent.putExtra("EMAIL_AMIGO", correoAmigo);
+        startActivity(intent);
+    }
+
     public class AccessFriends extends AsyncTask<Void, Void, Boolean> {
 
-        private final String email;
         private String cadena;
         private ArrayList<String> amigos = new ArrayList<String>();
-        private String correoAmigo;
 
-        AccessFriends(String email){
-            this.email = email;
-        }
         @Override
         protected Boolean doInBackground(Void... voids) {
 
@@ -77,39 +102,6 @@ public class Friends extends AppCompatActivity{
             }else{
                 System.out.println("Error");
             }
-        }
-
-        public void seleccionarOpcion() {
-            int botonSeleccionado = -1;
-            while (true) {
-                botonSeleccionado = adapter.getOpcion();
-                if (botonSeleccionado != -1)
-                    break;
-            }
-            switch (botonSeleccionado) {
-                case 0:
-                    abrirChat(emailPersonal);
-                    break;
-                case 1:
-                    abrirMapa(emailPersonal);
-                    break;
-            }
-        }
-
-        public void abrirMapa(String emailPropio){
-            correoAmigo = FriendsAdapter.getCorreoAmigo();
-            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-            intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
-            intent.putExtra("EMAIL_AMIGO", correoAmigo);
-            startActivity(intent);
-        }
-
-        public void abrirChat(String emailPropio){
-            correoAmigo = FriendsAdapter.getCorreoAmigo();
-            Intent intent = new Intent(getApplicationContext(), Chat.class);
-            intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
-            intent.putExtra("EMAIL_AMIGO", correoAmigo);
-            startActivity(intent);
         }
 
     }

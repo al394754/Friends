@@ -4,6 +4,7 @@ package com.example.friends.map;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +41,8 @@ public class Chat extends AppCompatActivity {
     ChatManager manager;
     String nombreFichero;
 
+    String contenidoPrevio = "";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,7 @@ public class Chat extends AppCompatActivity {
 
         manager = new ChatManager();
         manager.execute((Void) null);
+
 
         enviar.setOnClickListener(new View.OnClickListener() { //Enviar mensaje
             @Override
@@ -65,13 +69,11 @@ public class Chat extends AppCompatActivity {
             }
         });
 
-
     }
 
-    public void iniciarChat() throws IOException { //Iniciar la pantalla inicial con el chat
-        nombreFichero = participantes.get(0) + ":" + participantes.get(1);
-        chat.setText(lectura(nombreFichero));
-
+    public void actualizaPantalla(String texto){ //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
+        contenidoPrevio = texto;
+        chat.setText(texto);
     }
 
 
@@ -81,57 +83,76 @@ public class Chat extends AppCompatActivity {
             return;
         if(participantes.size() != 2)
             return;
-        String contenidoPrevio = lectura(nombreFichero);
         contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
-        escritura(nombreFichero, contenidoPrevio);
-        chat.setText(lectura(nombreFichero));
-
+        manager.escritura(nombreFichero, contenidoPrevio);
+        chat.setText(contenidoPrevio);
     }
 
-    public void escritura(String nombreFichero, String mensaje) throws IOException {
-        File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
-        System.out.println(file.toPath());
-        try {
-            BufferedWriter buf = new BufferedWriter(new FileWriter(file));
-            buf.write(mensaje);
-            buf.write("\n");
-            buf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String lectura(String nombreFichero) throws IOException {
-        File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
-        StringBuilder texto = new StringBuilder();
-        try {
-            BufferedReader buf = new BufferedReader(new FileReader(file));
-            String linea;
-            while ((linea = buf.readLine()) != null) {
-                texto.append(linea);
-                texto.append("\n");
-            }
-            buf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }return texto.toString();
-    }
 
 
     public class ChatManager extends AsyncTask<Void, Void, Boolean> {
-
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             participantes = obtenerParticipantes();
             try {
                 iniciarChat();
+                while(true){
+                    Thread.sleep(3000);
+                    actualizaPantalla(lectura(nombreFichero));
+                }
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             return true;
         }
 
+
+        public void iniciarChat() throws IOException { //Iniciar la pantalla inicial con el chat
+            nombreFichero = participantes.get(0) + ":" + participantes.get(1);
+            actualizaPantalla(lectura(nombreFichero));
+
+        }
+
+        public String lectura(String nombreFichero) throws IOException { //Leer localmente para enviar por pantalla
+            File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
+            StringBuilder texto = new StringBuilder();
+            try {
+                BufferedReader buf = new BufferedReader(new FileReader(file));
+                String linea;
+                while ((linea = buf.readLine()) != null) {
+                    texto.append(linea);
+                    texto.append("\n");
+                }
+                buf.close();
+                actualizaPantalla(texto.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }return texto.toString();
+        }
+
+        public String escritura(String nombreFichero, String mensaje) throws IOException {  //Se puede eliminar si solo leemos lo de fuera
+            File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
+            System.out.println(file.toPath());
+            try {
+                BufferedWriter buf = new BufferedWriter(new FileWriter(file));
+                buf.write(mensaje);
+                buf.write("\n");
+                buf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } return mensaje + "\n";
+        }
+
+        public String lecturaExterior(){ //Lee del sheet y almacena localmente
+            return null;//TODO
+        }
+
+        public void escrituraExterior(){ //Manda el mensaje al sheet
+            //TODO
+        }
 
         public List<String> obtenerParticipantes() {
             List<String> participantes = new ArrayList<>();
@@ -143,6 +164,10 @@ public class Chat extends AppCompatActivity {
                 }
             }
             return participantes;
+        }
+        @Override
+        protected void onCancelled(){
+            manager = null;
         }
     }
 }
