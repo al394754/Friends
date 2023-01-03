@@ -1,25 +1,19 @@
 package com.example.friends.map;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.List;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.friends.R;
 
@@ -30,7 +24,7 @@ import Utils.HttpsRequest;
 
 public class Friends extends AppCompatActivity{
 
-    private ArrayList<String> amigos = new ArrayList<String>(); //Listado de todos los amigos
+    private ArrayList<String> friendEmails = new ArrayList<String>(); //Listado de todos los amigos
     private String emailPersonal; //Usado como segundo email para mapa y chat
     private String correoAmigo;
     private AccessFriends access = null;
@@ -92,14 +86,17 @@ public class Friends extends AppCompatActivity{
 
     public class AccessFriends extends AsyncTask<Void, Void, Boolean> {
 
-        private String cadena;
-        private ArrayList<String> amigos = new ArrayList<String>();
+        private List<String> friendEmails = new ArrayList<String>();
+        private List<String> friendNames = new ArrayList<String>();
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-
+            List<List<String>> listas;
             try {
-                cadena = HttpsRequest.getFriends(emailPersonal);
+                //TODO: Haz lo de los nombres
+                //Lo he arreglado para que te devuelva dos listas
+                listas = HttpsRequest.getFriends(emailPersonal);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -107,14 +104,15 @@ public class Friends extends AppCompatActivity{
                 e.printStackTrace();
                 return false;
             }
-            amigos.addAll(Arrays.asList(cadena.replace("[", "").replace("]", "").replace("\"", "").split(","))); //pasar la cadena que obtenemos a lista
+            friendEmails = listas.get(0);
+            friendNames = listas.get(1);
             return true;
         }
         @Override
         protected void onPostExecute(final Boolean success){
             access = null;
             if(success){
-                adapter = new FriendsAdapter(emailPersonal, amigos, getApplicationContext());
+                adapter = new FriendsAdapter(emailPersonal, friendEmails, getApplicationContext());
                 listado.setAdapter(adapter);
             }else{
                 System.out.println("Error");

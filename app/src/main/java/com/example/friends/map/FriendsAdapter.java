@@ -22,17 +22,18 @@ import org.json.JSONException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import Utils.HttpsRequest;
 
 public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase para poder realizar el listado de amigos con botones
-    private ArrayList<String> amigos = new ArrayList<String>(); //Listado de amigos
+    private List<String> amigos = new ArrayList<String>(); //Listado de amigos
     private Context context;
     private static String correoAmigo; //Correo que usaremos para ubicar a nuestro amigo
     private String emailPropio; //Correo personal
     private Friends friends;
 
-    public FriendsAdapter(String emailPropio, ArrayList<String> amigos, Context context){
+    public FriendsAdapter(String emailPropio, List<String> amigos, Context context){
         this.emailPropio = emailPropio;
         this.amigos = amigos;
         this.context = context;

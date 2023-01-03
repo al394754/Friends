@@ -12,6 +12,11 @@ public class AESCrypt
     private static final String ALGORITHM = "AES";
     private static final String KEY = "1Hbfh667adfDEJ78";
 
+    /** Encripta value con ALGORITHM y la clave KEY, después devuelve el mensaje encriptado.
+     * @param value
+     * @return Mensaje encriptado
+     * @throws Exception
+     */
     public static String encrypt(String value) throws Exception
     {
         Key key = generateKey();
