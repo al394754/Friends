@@ -15,6 +15,7 @@ public class SolicitarAmigo extends AppCompatActivity {
 
     private AutoCompleteTextView email;
     private Button buscar;
+    private String emailPersonal;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,6 +24,11 @@ public class SolicitarAmigo extends AppCompatActivity {
 
         email = (AutoCompleteTextView) findViewById(R.id.email_friend);
         buscar = (Button) findViewById(R.id.email_send_request);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null){
+            emailPersonal = extras.getString("EMAIL");
+        }
 
     }
 
@@ -33,7 +39,6 @@ public class SolicitarAmigo extends AppCompatActivity {
         int posible = existeUsuario(emailUsuario);
         switch (posible) {
             case 0:
-                //TODO Mandar petición amigo
                 Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
                 toast.show();
                 break;
@@ -43,11 +48,15 @@ public class SolicitarAmigo extends AppCompatActivity {
             case 2:
                 email.setError("Este usuario ya es amigo suyo");
                 break;
+            case 3:
+                email.setError("Este usuario ya ha recibido una solicitud suya");
+                break;
         }
     }
 
     private int existeUsuario(String emailUsario){ //Mediante HTTP comprueba si el email existe y si es o no amigo
-        //TODO 0 = existe, 1 = no existe, 2 = existe pero ya es amigo
+        //0 = existe, 1 = no existe, 2 = existe pero ya es amigo, 3 = existe pero ya hay solicitud
+
         return 0;
     }
 }
