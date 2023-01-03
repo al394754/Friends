@@ -2,6 +2,7 @@ package com.example.friends.map;
 
 import static Utils.HttpsRequest.requestFriend;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -22,6 +23,8 @@ public class SolicitarAmigo extends AppCompatActivity {
     private AutoCompleteTextView email;
     private Button buscar;
     private String emailPersonal;
+    public static int posible;
+    private SolicitarAux aux;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,7 +45,8 @@ public class SolicitarAmigo extends AppCompatActivity {
 
     private void checkUser() throws JSONException, IOException {
         String emailUsuario = email.getText().toString();
-        int posible = existeUsuario(emailUsuario);
+        aux = new SolicitarAux(emailUsuario);
+        aux.execute((Void) null);
         switch (posible) {
             case 0:
                 Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
@@ -57,11 +61,35 @@ public class SolicitarAmigo extends AppCompatActivity {
             case 3:
                 email.setError("Este usuario ya ha recibido una solicitud suya");
                 break;
+        }email.setText("");
+        aux = null;
+    }
+
+    private class SolicitarAux extends AsyncTask<Void, Void, Boolean> {
+
+        private String usuario;
+
+        public SolicitarAux(String usuario){
+            this.usuario = usuario;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                existeUsuario(usuario);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private void existeUsuario(String emailUsario) throws JSONException, IOException { //Mediante HTTP comprueba si el email existe y si es o no amigo
+            //0 = existe, 1 = no existe, 2 = existe pero ya es amigo, 3 = existe pero ya hay solicitud
+            posible = requestFriend(emailPersonal, emailUsario);
         }
     }
 
-    private int existeUsuario(String emailUsario) throws JSONException, IOException { //Mediante HTTP comprueba si el email existe y si es o no amigo
-        //0 = existe, 1 = no existe, 2 = existe pero ya es amigo, 3 = existe pero ya hay solicitud
-        return requestFriend(emailPersonal, emailUsario);
-    }
+
 }
