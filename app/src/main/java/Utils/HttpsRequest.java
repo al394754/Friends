@@ -61,6 +61,17 @@ public class HttpsRequest {
         JSONObject object = new JSONObject(JsonString);
         return object.getJSONArray("Friends").toString(); //Lo paso a String ya que tenía problemas de conversión a lista
     }
+    public static String getRequestFriends(String email) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","GETREQUESTFRIENDS");
+        parameters.put("EMAIL",email);
+        httpRequest.createGETRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getJSONArray("RequestFriends").toString(); //Lo paso a String ya que tenía problemas de conversión a lista
+    }
     public static String getCoordinates(String email) throws IOException, JSONException {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
