@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.io.IOException;
@@ -30,10 +31,14 @@ import Utils.HttpsRequest;
 public class Friends extends AppCompatActivity{
 
     private ArrayList<String> amigos = new ArrayList<String>(); //Listado de todos los amigos
-    private String emailPersonal;
+    private String emailPersonal; //Usado como segundo email para mapa y chat
     private String correoAmigo;
     private AccessFriends access = null;
+
     private ListView listado;
+    private Button buscarAmigo;
+    private Button verSolicitudes;
+
     private FriendsAdapter adapter;
 
     @Override
@@ -41,9 +46,14 @@ public class Friends extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
 
-        emailPersonal = "alexManea@gmail.com";
+        Bundle extras = getIntent().getExtras();
+        if (extras != null){
+            emailPersonal = extras.getString("EMAIL");
+        }
 
         listado = (ListView) findViewById(R.id.listView);
+        buscarAmigo = (Button) findViewById(R.id.buscarAmigos);
+        verSolicitudes = (Button) findViewById(R.id.solicitudesAmigos);
 
         //adapter = new FriendsAdapter(emailPersonal, amigos, getApplicationContext());
 
@@ -55,6 +65,8 @@ public class Friends extends AppCompatActivity{
 
     public void onClickFriendMapButton(View view){ abrirMapa(emailPersonal); }
     public void onClickChatButton(View view){ abrirChat(emailPersonal); }
+    public void onClickBuscarButton(View view){ buscarEmailAmigo(emailPersonal); }
+    public void onClickSolicitudesButton(View view){ consultarSolicitudes(emailPersonal); }
 
 
     public void abrirMapa(String emailPropio){
@@ -70,6 +82,18 @@ public class Friends extends AppCompatActivity{
         Intent intent = new Intent(getApplicationContext(), Chat.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         intent.putExtra("EMAIL_AMIGO", correoAmigo);
+        startActivity(intent);
+    }
+
+    public void buscarEmailAmigo(String emailPropio){
+        Intent intent = new Intent(getApplicationContext(), SolicitarAmigo.class);
+        intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
+        startActivity(intent);
+    }
+
+    public void consultarSolicitudes(String emailPropio){
+        Intent intent = new Intent(getApplicationContext(), Solicitudes.class);
+        intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         startActivity(intent);
     }
 

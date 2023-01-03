@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="202dp"
         android:layout_marginEnd="35dp"
-        android:onClick="onClickMapButton"
+        android:onClick="onClickFriendMapButton"
         android:text="Mapa"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:text="TextView"
         android:textSize="18sp"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="44dp"
-        tools:layout_editor_absoluteY="217dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="217dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

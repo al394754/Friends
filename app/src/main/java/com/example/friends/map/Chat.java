@@ -133,7 +133,7 @@ public class Chat extends AppCompatActivity {
             }return texto.toString();
         }
 
-        public String escritura(String nombreFichero, String mensaje) throws IOException {  //Se puede eliminar si solo leemos lo de fuera
+        public String escritura(String nombreFichero, String mensaje) throws IOException {  //Se necesita almacenar igualmente en fichero, no podemos eliminar
             File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
             System.out.println(file.toPath());
             try {
