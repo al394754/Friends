@@ -27,6 +27,29 @@ public class HttpsRequest {
         super();
         this.url=new StringBuilder(Url);
     }
+    public static boolean requestResponse(String userEmail,String emailFriend,Boolean response) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","REQUESTFRIENDRESPONSE");
+        parameters.put("USEREMAIL",userEmail);
+        parameters.put("FRIENDEMAIL",emailFriend);
+        parameters.put("RESPONSEREQUEST",response.toString());
+        httpRequest.createPOSTRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getBoolean("ResponseRequest");       }
+    public static int requestFriend(String userEmail,String emailFriend) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","REQUESTFRIEND");
+        parameters.put("USEREMAIL",userEmail);
+        parameters.put("FRIENDEMAIL",emailFriend);
+        httpRequest.createPOSTRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        Log.d("Response ",JsonString);
+        JSONObject object = new JSONObject(JsonString);
+        return object.getInt("ResponseRequest");       }
     public static String getFriends(String email) throws IOException, JSONException {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
