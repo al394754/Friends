@@ -1,5 +1,7 @@
 package com.example.friends.map;
 
+import static Utils.HttpsRequest.requestFriend;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -10,6 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.friends.R;
+
+import org.json.JSONException;
+
+import java.io.IOException;
 
 public class SolicitarAmigo extends AppCompatActivity {
 
@@ -32,9 +38,9 @@ public class SolicitarAmigo extends AppCompatActivity {
 
     }
 
-    public void onClickCheckUser(View view) { checkUser(); }
+    public void onClickCheckUser(View view) throws JSONException, IOException { checkUser(); }
 
-    private void checkUser() {
+    private void checkUser() throws JSONException, IOException {
         String emailUsuario = email.getText().toString();
         int posible = existeUsuario(emailUsuario);
         switch (posible) {
@@ -54,9 +60,8 @@ public class SolicitarAmigo extends AppCompatActivity {
         }
     }
 
-    private int existeUsuario(String emailUsario){ //Mediante HTTP comprueba si el email existe y si es o no amigo
+    private int existeUsuario(String emailUsario) throws JSONException, IOException { //Mediante HTTP comprueba si el email existe y si es o no amigo
         //0 = existe, 1 = no existe, 2 = existe pero ya es amigo, 3 = existe pero ya hay solicitud
-
-        return 0;
+        return requestFriend(emailPersonal, emailUsario);
     }
 }
