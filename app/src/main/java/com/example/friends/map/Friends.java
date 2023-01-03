@@ -39,6 +39,8 @@ public class Friends extends AppCompatActivity{
     private Button buscarAmigo;
     private Button verSolicitudes;
 
+    private static Friends friend;
+
     private FriendsAdapter adapter;
 
     @Override
@@ -46,10 +48,14 @@ public class Friends extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
 
-        Bundle extras = getIntent().getExtras();
+        friend = this;
+
+        /*Bundle extras = getIntent().getExtras();
         if (extras != null){
             emailPersonal = extras.getString("EMAIL");
-        }
+        }*/
+
+        emailPersonal = "alexManea@gmail.com";
 
         listado = (ListView) findViewById(R.id.listView);
         buscarAmigo = (Button) findViewById(R.id.buscarAmigos);
@@ -63,27 +69,14 @@ public class Friends extends AppCompatActivity{
 
     }
 
-    public void onClickFriendMapButton(View view){ abrirMapa(emailPersonal); }
-    public void onClickChatButton(View view){ abrirChat(emailPersonal); }
     public void onClickBuscarButton(View view){ buscarEmailAmigo(emailPersonal); }
     public void onClickSolicitudesButton(View view){ consultarSolicitudes(emailPersonal); }
 
 
-    public void abrirMapa(String emailPropio){
-        correoAmigo = FriendsAdapter.getCorreoAmigo();
-        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-        intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
-        intent.putExtra("EMAIL_AMIGO", correoAmigo);
-        startActivity(intent);
+    public static Friends instancia(){
+        return friend;
     }
 
-    public void abrirChat(String emailPropio){
-        correoAmigo = FriendsAdapter.getCorreoAmigo();
-        Intent intent = new Intent(getApplicationContext(), Chat.class);
-        intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
-        intent.putExtra("EMAIL_AMIGO", correoAmigo);
-        startActivity(intent);
-    }
 
     public void buscarEmailAmigo(String emailPropio){
         Intent intent = new Intent(getApplicationContext(), SolicitarAmigo.class);
