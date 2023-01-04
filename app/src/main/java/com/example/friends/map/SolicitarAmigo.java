@@ -2,6 +2,7 @@ package com.example.friends.map;
 
 import static Utils.HttpsRequest.requestFriend;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.example.friends.R;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 public class SolicitarAmigo extends AppCompatActivity {
 
@@ -40,13 +42,11 @@ public class SolicitarAmigo extends AppCompatActivity {
         }
 
     }
-
-    public void onClickCheckUser(View view) throws JSONException, IOException { checkUser(); }
-
-    private void checkUser() throws JSONException, IOException {
+    public void onClickCheckUser(View view) throws ExecutionException, InterruptedException { checkUser(); }
+    private void checkUser() throws InterruptedException, ExecutionException {
         String emailUsuario = email.getText().toString();
         aux = new SolicitarAux(emailUsuario);
-        aux.execute((Void) null);
+        aux.execute((Void) null).get();
         switch (posible) {
             case 0:
                 Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
@@ -64,7 +64,7 @@ public class SolicitarAmigo extends AppCompatActivity {
         }email.setText("");
         aux = null;
     }
-
+    @SuppressLint("StaticFieldLeak")
     private class SolicitarAux extends AsyncTask<Void, Void, Boolean> {
 
         private String usuario;

@@ -36,7 +36,11 @@ public class Friends extends AppCompatActivity{
     private static Friends friend;
 
     private FriendsAdapter adapter;
-
+    public void onPostResume() {
+        super.onPostResume();
+        access = new AccessFriends();
+        access.execute((Void) null);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +87,6 @@ public class Friends extends AppCompatActivity{
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         startActivity(intent);
     }
-
     public class AccessFriends extends AsyncTask<Void, Void, Boolean> {
 
         private List<String> friendEmails = new ArrayList<String>();

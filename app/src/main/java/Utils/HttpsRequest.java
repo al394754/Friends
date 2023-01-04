@@ -42,7 +42,7 @@ public class HttpsRequest {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","READCHAT");
-        parameters.put("EMAIL1",email1);
+        parameters.put("EMAIL",email1);
         parameters.put("EMAIL2",email2);
         httpRequest.createGETRequest(parameters);
         String JsonString = httpRequest.getResponse();
@@ -71,7 +71,7 @@ public class HttpsRequest {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","WRITECHAT");
-        parameters.put("EMAIL1",email1);
+        parameters.put("EMAIL",email1);
         parameters.put("EMAIL2",email2);
         parameters.put("MESSAGE",message);
         httpRequest.createPOSTRequest(parameters);
@@ -83,7 +83,7 @@ public class HttpsRequest {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","REQUESTFRIENDRESPONSE");
-        parameters.put("USEREMAIL",userEmail);
+        parameters.put("EMAIL",userEmail);
         parameters.put("FRIENDEMAIL",emailFriend);
         parameters.put("RESPONSEREQUEST",response.toString());
         httpRequest.createPOSTRequest(parameters);
@@ -94,13 +94,14 @@ public class HttpsRequest {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","REQUESTFRIEND");
-        parameters.put("USEREMAIL",userEmail);
+        parameters.put("EMAIL",userEmail);
         parameters.put("FRIENDEMAIL",emailFriend);
         httpRequest.createPOSTRequest(parameters);
         String JsonString = httpRequest.getResponse();
         JSONObject object = new JSONObject(JsonString);
         return object.getInt("ResponseRequest");       }
     public static List<List<String>> getFriends(String email) throws IOException, JSONException {
+        Log.d("Get Friends: ", email);
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","GETFRIENDS");
@@ -211,8 +212,8 @@ public class HttpsRequest {
         URL urlObj= new URL(url.toString());
         Log.d("URL: ", url.toString());
         con = (HttpsURLConnection) urlObj.openConnection();
-        Log.d("Headers ",con.getHeaderFields().toString());
         con.setRequestMethod("POST");
+        Log.d("Headers ",con.getHeaderFields().toString());
         con.setConnectTimeout(5000);
         con.setReadTimeout(5000);
         con.connect();
