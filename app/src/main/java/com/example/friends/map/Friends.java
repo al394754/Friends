@@ -44,12 +44,12 @@ public class Friends extends AppCompatActivity{
 
         friend = this;
 
-        /*Bundle extras = getIntent().getExtras();
+        Bundle extras = getIntent().getExtras();
         if (extras != null){
             emailPersonal = extras.getString("EMAIL");
-        }*/
+        }
 
-        emailPersonal = "alexManea@gmail.com";
+        //emailPersonal = "alexManea@gmail.com";
 
         listado = (ListView) findViewById(R.id.listView);
         buscarAmigo = (Button) findViewById(R.id.buscarAmigos);
