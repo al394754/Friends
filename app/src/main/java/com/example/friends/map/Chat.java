@@ -16,6 +16,8 @@ import androidx.loader.content.AsyncTaskLoader;
 
 import com.example.friends.R;
 
+import org.json.JSONException;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,6 +32,8 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import Utils.HttpsRequest;
 
 public class Chat extends AppCompatActivity {
 
@@ -63,7 +67,7 @@ public class Chat extends AppCompatActivity {
                 entrada.setText("");
                 try {
                     chat(mensaje);
-                } catch (IOException e) {
+                } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -77,14 +81,15 @@ public class Chat extends AppCompatActivity {
     }
 
 
-    public void chat(String mensaje) throws IOException {
+    public void chat(String mensaje) throws IOException, JSONException {
 
         if (participantes.equals(null))
             return;
         if(participantes.size() != 2)
             return;
         contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
-        manager.escritura(nombreFichero, contenidoPrevio);
+        manager.escrituraExterior(mensaje);
+        //manager.escritura(nombreFichero, contenidoPrevio);
         chat.setText(contenidoPrevio);
     }
 
@@ -97,13 +102,8 @@ public class Chat extends AppCompatActivity {
             participantes = obtenerParticipantes();
             try {
                 iniciarChat();
-                while(true){
-                    Thread.sleep(3000);
-                    actualizaPantalla(lectura(nombreFichero));
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+                escrituraExterior("hola");
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
             return true;
@@ -133,7 +133,7 @@ public class Chat extends AppCompatActivity {
             }return texto.toString();
         }
 
-        public String escritura(String nombreFichero, String mensaje) throws IOException {  //Se necesita almacenar igualmente en fichero, no podemos eliminar
+        public String escritura(String nombreFichero, String mensaje) throws IOException, JSONException {  //Se necesita almacenar igualmente en fichero, no podemos eliminar
             File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
             System.out.println(file.toPath());
             try {
@@ -143,15 +143,17 @@ public class Chat extends AppCompatActivity {
                 buf.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            } return mensaje + "\n";
+            } escrituraExterior(mensaje);
+            return mensaje + "\n";
         }
 
         public String lecturaExterior(){ //Lee del sheet y almacena localmente
-            return null;//TODO
+
+            return null; //TODO
         }
 
-        public void escrituraExterior(){ //Manda el mensaje al sheet
-            //TODO
+        public void escrituraExterior(String mensaje) throws JSONException, IOException { //Manda el mensaje al sheet
+            HttpsRequest.writeChat(participantes.get(0), participantes.get(1), mensaje);
         }
 
         public List<String> obtenerParticipantes() {

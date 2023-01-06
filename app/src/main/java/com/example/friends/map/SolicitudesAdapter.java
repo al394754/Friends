@@ -1,6 +1,7 @@
 package com.example.friends.map;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,8 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
     private static String correoSolicitante;
     private Context context;
     private Solicitudes solicitudes;
+    private SolicitudesAceptarAux aceptarAux; //Para poder aceptar en otro hilo
+    private SolicitudesRechazarAux rechazarAux; //Para poder rechazar en otro hilo
 
     public SolicitudesAdapter(String correoPersonal, List<String> solicitudesPendientes, Context context){
         this.correoPersonal = correoPersonal;
@@ -35,12 +38,12 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return solicitudesPendientes.size();
     }
 
     @Override
     public Object getItem(int i) {
-        return null;
+        return solicitudesPendientes.get(i);
     }
 
     @Override
@@ -60,15 +63,14 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
 
         correoSolicitante = solicitudesPendientes.get(pos);
 
+        System.out.println("Sol: " + solicitudesPendientes);
+
         Button agregar = (Button) view.findViewById(R.id.agregar);
         agregar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    aceptarSolicitud(correoSolicitante);
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
+                aceptarAux = new SolicitudesAceptarAux();
+                aceptarAux.execute();
             }
         });
 
@@ -76,21 +78,65 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
         rechazar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    rechazarSolicitud(correoSolicitante);
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
+                rechazarAux = new SolicitudesRechazarAux();
+                rechazarAux.execute();
             }
         });
         return view;
     }
 
-    public void aceptarSolicitud(String emailSolicitante) throws JSONException, IOException {
-        HttpsRequest.requestResponse(correoPersonal, emailSolicitante, true);
+
+    private class SolicitudesAceptarAux extends AsyncTask<Void, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                aceptarSolicitud(correoSolicitante);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            aceptarAux = null;
+        }
+
+        public void aceptarSolicitud(String emailSolicitante) throws JSONException, IOException {
+            HttpsRequest.requestResponse(correoPersonal, correoSolicitante, true);
+        }
+
+
+
+    }
+    private class SolicitudesRechazarAux extends AsyncTask<Void, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                rechazarSolicitud(correoSolicitante);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            rechazarAux = null;
+        }
+
+        public void rechazarSolicitud(String emailSolicitante) throws JSONException, IOException {
+            HttpsRequest.requestResponse(correoPersonal, emailSolicitante, false);
+        }
+
+
+
     }
 
-    public void rechazarSolicitud(String emailSolicitante) throws JSONException, IOException {
-        HttpsRequest.requestResponse(correoPersonal, emailSolicitante, false);
-    }
+
+
 }

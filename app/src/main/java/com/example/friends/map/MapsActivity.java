@@ -118,6 +118,8 @@ public class MapsActivity extends AppCompatActivity
             }
         }
 
+        System.out.println(emailAjeno);
+
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         String provider = service.getBestProvider(criteria, false);
@@ -280,9 +282,11 @@ public class MapsActivity extends AppCompatActivity
         protected Boolean doInBackground(Void... voids) {
 
             try {
-                if(emailAmigo != null) {
+                if(emailAmigo != null || emailAmigo.compareTo("") != 0) {
                     cadena = HttpsRequest.getCoordinates(emailAmigo);
+                    System.out.println(cadena);
                 }
+                System.out.println("Cadena: " + cadena);
                 String misNuevasCoordenadas = coordenadasActuales.toString().replace("lat/lng: (", "").replace(")", "").replace(",", ":");
                 HttpsRequest.updateCoordinates(emailPropio, misNuevasCoordenadas);
             } catch (IOException e) {

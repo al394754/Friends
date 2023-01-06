@@ -63,6 +63,7 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
 
             try {
                 listas = HttpsRequest.getRequestFriends(emailPersonal);
+                System.out.println(listas);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;

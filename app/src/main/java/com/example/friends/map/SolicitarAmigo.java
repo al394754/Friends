@@ -45,22 +45,33 @@ public class SolicitarAmigo extends AppCompatActivity {
     public void onClickCheckUser(View view) throws ExecutionException, InterruptedException { checkUser(); }
     private void checkUser() throws InterruptedException, ExecutionException {
         String emailUsuario = email.getText().toString();
-        aux = new SolicitarAux(emailUsuario);
-        aux.execute((Void) null).get();
-        switch (posible) {
-            case 0:
-                Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
+        if(emailUsuario.compareTo("") == 0) {
+            Toast toast = Toast.makeText(getApplicationContext(), "Debe introducir un usuario", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+        else {
+            if (emailUsuario.compareTo(emailPersonal) == 0) {
+                Toast toast = Toast.makeText(getApplicationContext(), "No puede agregarse a si mismo", Toast.LENGTH_SHORT);
                 toast.show();
-                break;
-            case 1:
-                email.setError("No existe dicho usuario");
-                break;
-            case 2:
-                email.setError("Este usuario ya es amigo suyo");
-                break;
-            case 3:
-                email.setError("Este usuario ya ha recibido una solicitud suya");
-                break;
+            } else {
+                aux = new SolicitarAux(emailUsuario);
+                aux.execute((Void) null).get();
+                switch (posible) {
+                    case 0:
+                        Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
+                        toast.show();
+                        break;
+                    case 1:
+                        email.setError("No existe dicho usuario");
+                        break;
+                    case 2:
+                        email.setError("Este usuario ya ha recibido una solicitud suya");
+                        break;
+                    case 3:
+                        email.setError("Este usuario ya es amigo suyo");
+                        break;
+                }
+            }
         }email.setText("");
         aux = null;
     }
@@ -86,7 +97,7 @@ public class SolicitarAmigo extends AppCompatActivity {
         }
 
         private void existeUsuario(String emailUsario) throws JSONException, IOException { //Mediante HTTP comprueba si el email existe y si es o no amigo
-            //0 = existe, 1 = no existe, 2 = existe pero ya es amigo, 3 = existe pero ya hay solicitud
+            //0 = existe, 1 = no existe, 2 = existe pero ha recibido solicitud, 3 = existe pero ya es amigo
             posible = requestFriend(emailPersonal, emailUsario);
         }
     }
