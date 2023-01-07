@@ -143,11 +143,12 @@ public class HttpsRequest {
         FriendRequests.add(listNames);
         return FriendRequests;
     }
-    public static String getCoordinates(String email) throws IOException, JSONException {
+    public static String getCoordinates(String emailUser, String emailFriend) throws IOException, JSONException {
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","GETCOORDINATES");
-        parameters.put("EMAIL",email);
+        parameters.put("EMAIL",emailUser);
+        parameters.put("EMAILFRIEND",emailUser);
         httpRequest.createGETRequest(parameters);
         String JsonString = httpRequest.getResponse();
         JSONObject object = new JSONObject(JsonString);

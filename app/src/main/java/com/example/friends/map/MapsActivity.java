@@ -283,7 +283,7 @@ public class MapsActivity extends AppCompatActivity
 
             try {
                 if(emailAmigo != null || emailAmigo.compareTo("") != 0) {
-                    cadena = HttpsRequest.getCoordinates(emailAmigo);
+                    cadena = HttpsRequest.getCoordinates(emailPropio,emailAmigo);
                     System.out.println(cadena);
                 }
                 System.out.println("Cadena: " + cadena);
