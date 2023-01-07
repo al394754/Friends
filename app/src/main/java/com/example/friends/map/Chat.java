@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,8 +33,14 @@ import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import Utils.HttpsRequest;
+import Utils.Message;
 
 public class Chat extends AppCompatActivity {
 
@@ -75,10 +82,15 @@ public class Chat extends AppCompatActivity {
             }
         });
 
+        lecturaAux = new LecturaAux();
+        lecturaAux.execute((Void) null);
+
+
+
     }
 
     public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
-        //contenidoPrevio = manager.lectura(nombreFichero);
+        contenidoPrevio = manager.lectura(nombreFichero);
         chat.setText(texto);
     }
 
@@ -116,8 +128,7 @@ public class Chat extends AppCompatActivity {
 
         public void iniciarChat() throws IOException { //Iniciar la pantalla inicial con el chat
             nombreFichero = participantes.get(0) + ":" + participantes.get(1);
-            actualizaPantalla(lectura(nombreFichero));
-
+            //actualizaPantalla(lectura(nombreFichero));
         }
 
         public String lectura(String nombreFichero) throws IOException { //Leer localmente para enviar por pantalla
@@ -204,19 +215,22 @@ public class Chat extends AppCompatActivity {
     }
     public class LecturaAux extends AsyncTask<Void, Void, Boolean>{
 
+        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
         @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                while(true) {
+        protected Boolean doInBackground(Void... voids) { //Espera 10 segundos entre lectura y lectura, al cabo de 30 minutos finaliza la ejecución
+
+            Runnable lect = () -> {
+                try {
                     lecturaExterior();
-                    Thread.sleep(5000);
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } catch (InterruptedException | JSONException e) {
-                e.printStackTrace();
-            }
+            };
+            ScheduledFuture<?> handler = scheduler.scheduleAtFixedRate(lect, 10, 10, TimeUnit.SECONDS);
+            Runnable parar = () -> handler.cancel(false);
+            scheduler.schedule(parar, 30, TimeUnit.MINUTES);
+
             return true;
         }
 
@@ -226,11 +240,21 @@ public class Chat extends AppCompatActivity {
         }
 
         public String lecturaExterior() throws IOException, JSONException { //Lee del sheet y almacena localmente
-           //todo Método Http
-           String respuesta = "";
-           manager.escritura(nombreFichero, respuesta);
-           actualizaPantalla(respuesta);
+           List<Message> mensajes = HttpsRequest.getChat(participantes.get(0), participantes.get(1));
+           Message mensaje = new Message();
+            File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
+            System.out.println(file.toPath());
+            BufferedWriter buf = new BufferedWriter(new FileWriter(file));
+           for(int i = 0; i < mensajes.size(); i++){
+               mensaje = mensajes.get(i);
+               buf.write(mensaje.getWriter() + ":" + mensaje.getMessage());
+               buf.write("\n");
+               buf.close();
+           }
+           //manager.escritura(nombreFichero, respuesta);
+            actualizaPantalla(manager.lectura(nombreFichero));
            return "";
         }
     }
+
 }

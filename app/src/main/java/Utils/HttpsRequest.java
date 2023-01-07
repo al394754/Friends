@@ -148,7 +148,7 @@ public class HttpsRequest {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("ACTION","GETCOORDINATES");
         parameters.put("EMAIL",emailUser);
-        parameters.put("EMAILFRIEND",emailUser);
+        parameters.put("EMAILFRIEND",emailFriend);
         httpRequest.createGETRequest(parameters);
         String JsonString = httpRequest.getResponse();
         JSONObject object = new JSONObject(JsonString);

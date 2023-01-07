@@ -80,7 +80,7 @@ public class MapsActivity extends AppCompatActivity
     private SupportMapFragment mapFragment;
     private GoogleMap map;
     private String emailPropio; //Email del propio usuario
-    private String emailAjeno; //Email de amigo
+    private String emailAjeno = ""; //Email de amigo
     private LatLng coordinatesOtro = null; //Coordenadas dde amigo
     private LatLng coordenadasActuales; //Con esto actualizaremos nuestra posicion actual
     private AccessCoordinates accessCoordinates; //Utilizar para obtener coordenadas
@@ -118,7 +118,8 @@ public class MapsActivity extends AppCompatActivity
             }
         }
 
-        System.out.println(emailAjeno);
+        System.out.println("Email amigo: " + emailAjeno);
+
 
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -284,7 +285,6 @@ public class MapsActivity extends AppCompatActivity
             try {
                 if(emailAmigo != null || emailAmigo.compareTo("") != 0) {
                     cadena = HttpsRequest.getCoordinates(emailPropio,emailAmigo);
-                    System.out.println(cadena);
                 }
                 System.out.println("Cadena: " + cadena);
                 String misNuevasCoordenadas = coordenadasActuales.toString().replace("lat/lng: (", "").replace(")", "").replace(",", ":");
@@ -315,6 +315,6 @@ public class MapsActivity extends AppCompatActivity
     private void creaCoordenadas(String coordenadas) {
         String[] param = coordenadas.split(":");
         coordinatesOtro = new LatLng(Double.parseDouble(param[0]), Double.parseDouble(param[1])); //Latitud : Longitud
-        map.addMarker(new MarkerOptions().position(coordinatesOtro).title("Posicion")); //Añadimos un marcador sobre la posicion de una persona    }
+        map.addMarker(new MarkerOptions().position(coordinatesOtro).title(emailAjeno)); //Añadimos un marcador sobre la posicion de una persona    }
     }
 }
