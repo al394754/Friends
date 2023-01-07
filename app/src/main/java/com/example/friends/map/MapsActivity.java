@@ -288,6 +288,7 @@ public class MapsActivity extends AppCompatActivity
                 }
                 System.out.println("Cadena: " + cadena);
                 String misNuevasCoordenadas = coordenadasActuales.toString().replace("lat/lng: (", "").replace(")", "").replace(",", ":");
+
                 HttpsRequest.updateCoordinates(emailPropio, misNuevasCoordenadas);
             } catch (IOException e) {
                 e.printStackTrace();

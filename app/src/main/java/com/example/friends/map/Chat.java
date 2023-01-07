@@ -43,8 +43,10 @@ public class Chat extends AppCompatActivity {
 
     List<String> participantes; //los dos participantes para formar el nombre del fichero
     ChatManager manager;
-    String nombreFichero;
+    EnvioAux envioAux;
+    LecturaAux lecturaAux;
 
+    String nombreFichero;
     String contenidoPrevio = "";
 
     @Override
@@ -75,8 +77,8 @@ public class Chat extends AppCompatActivity {
 
     }
 
-    public void actualizaPantalla(String texto){ //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
-        contenidoPrevio = texto;
+    public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
+        //contenidoPrevio = manager.lectura(nombreFichero);
         chat.setText(texto);
     }
 
@@ -88,22 +90,24 @@ public class Chat extends AppCompatActivity {
         if(participantes.size() != 2)
             return;
         contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
-        manager.escrituraExterior(mensaje);
+        envioAux = new EnvioAux(mensaje, nombreFichero);
+        envioAux.execute((Void) null);
         //manager.escritura(nombreFichero, contenidoPrevio);
         chat.setText(contenidoPrevio);
     }
 
 
 
-    public class ChatManager extends AsyncTask<Void, Void, Boolean> {
+
+
+    public class ChatManager extends AsyncTask<Void, Void, Boolean> { //Leer/Escribir localmente
 
         @Override
         protected Boolean doInBackground(Void... voids) {
             participantes = obtenerParticipantes();
             try {
                 iniciarChat();
-                escrituraExterior("hola");
-            } catch (IOException | JSONException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             return true;
@@ -143,18 +147,10 @@ public class Chat extends AppCompatActivity {
                 buf.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            } escrituraExterior(mensaje);
+            }
             return mensaje + "\n";
         }
 
-        public String lecturaExterior(){ //Lee del sheet y almacena localmente
-
-            return null; //TODO
-        }
-
-        public void escrituraExterior(String mensaje) throws JSONException, IOException { //Manda el mensaje al sheet
-            HttpsRequest.writeChat(participantes.get(0), participantes.get(1), mensaje);
-        }
 
         public List<String> obtenerParticipantes() {
             List<String> participantes = new ArrayList<>();
@@ -170,6 +166,71 @@ public class Chat extends AppCompatActivity {
         @Override
         protected void onCancelled(){
             manager = null;
+        }
+    }
+
+    public class EnvioAux extends AsyncTask<Void, Void, Boolean>{ //Esta clase escribe hacia el exterior y guarda localmente
+
+        private String mensaje;
+        private String nombreFichero;
+
+        public EnvioAux(String mensaje, String nombreFichero){
+            this.mensaje = mensaje;
+            this.nombreFichero = nombreFichero;
+        }
+        @Override
+        protected Boolean doInBackground(Void... voids) { //Mando fuera y escribo local --> Leo local --> Actualizo pantalla
+            try {
+                escrituraExterior(mensaje);
+                //manager.escritura(nombreFichero, mensaje);
+                //String nuevoContenido = manager.lectura(nombreFichero);
+                //actualizaPantalla(nuevoContenido);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success){
+            envioAux = null;
+        }
+
+
+        public void escrituraExterior(String mensaje) throws JSONException, IOException { //Manda el mensaje al sheet
+            HttpsRequest.writeChat(participantes.get(0), participantes.get(1), mensaje);
+        }
+    }
+    public class LecturaAux extends AsyncTask<Void, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+            try {
+                while(true) {
+                    lecturaExterior();
+                    Thread.sleep(5000);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (InterruptedException | JSONException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success){
+            lecturaAux = null;
+        }
+
+        public String lecturaExterior() throws IOException, JSONException { //Lee del sheet y almacena localmente
+           //todo Método Http
+           String respuesta = "";
+           manager.escritura(nombreFichero, respuesta);
+           actualizaPantalla(respuesta);
+           return "";
         }
     }
 }
