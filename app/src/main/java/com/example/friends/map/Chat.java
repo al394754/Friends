@@ -33,11 +33,13 @@ import java.nio.CharBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
 
 import Utils.HttpsRequest;
@@ -57,6 +59,7 @@ public class Chat extends AppCompatActivity {
     String nombreFichero;
     String contenidoPrevio = "";
 
+
     private final ScheduledExecutorService mainScheduler = Executors.newScheduledThreadPool(1);
 
 
@@ -73,6 +76,14 @@ public class Chat extends AppCompatActivity {
         manager = new ChatManager();
         manager.execute((Void) null);
 
+
+
+        System.out.println("Texto: " + contenidoPrevio);
+
+        String[] listadoMensajes = contenidoPrevio.split("---");
+        for(String mensaje: listadoMensajes){
+            chat.append(mensaje);
+        }
 
         enviar.setOnClickListener(new View.OnClickListener() { //Enviar mensaje
             @Override
@@ -117,12 +128,12 @@ public class Chat extends AppCompatActivity {
         contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
         envioAux = new EnvioAux(mensaje, nombreFichero);
         envioAux.execute((Void) null);
-        //manager.escritura(nombreFichero, contenidoPrevio);
+        manager.escritura(nombreFichero, contenidoPrevio);
     }
 
-    public void iniciarChat() throws IOException { //Iniciar la pantalla inicial con el chat
+    public void iniciarChat() throws IOException, InterruptedException { //Iniciar la pantalla inicial con el chat
         nombreFichero = participantes.get(0) + ":" + participantes.get(1);
-        actualizaPantalla(lectura(nombreFichero));
+        contenidoPrevio = lectura(nombreFichero);
     }
 
     public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
@@ -133,7 +144,10 @@ public class Chat extends AppCompatActivity {
             }
         })).start();*/
         //chat.setText(texto);
-        chat.append(texto);
+        String[] chatCompleto = texto.split("---");
+        for (String mensaje: chatCompleto){
+            chat.append(mensaje);
+        }
     }
 
 
@@ -163,7 +177,7 @@ public class Chat extends AppCompatActivity {
 
             try {
                 iniciarChat();
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
 
@@ -179,7 +193,7 @@ public class Chat extends AppCompatActivity {
             try {
                 BufferedWriter buf = new BufferedWriter(new FileWriter(file));
                 buf.write(mensaje);
-                buf.write("\n");
+                buf.write("---");
                 buf.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -265,19 +279,19 @@ public class Chat extends AppCompatActivity {
             lecturaAux = null;
         }
 
-        public String lecturaExterior() throws IOException, JSONException { //Lee del sheet y almacena localmente
+        public void lecturaExterior() throws IOException, JSONException { //Lee del sheet y almacena localmente
            List<Message> mensajes = HttpsRequest.getChat(participantes.get(0), participantes.get(1));
+           System.out.println("Cantidad de mensajes: " + mensajes.size());
            Message mensaje = new Message();
-           File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
-            BufferedWriter buf = new BufferedWriter(new FileWriter(file));
+           StringBuilder chatActual = new StringBuilder();
            for(int i = 0; i < mensajes.size(); i++){
                mensaje = mensajes.get(i);
-               buf.write(mensaje.getWriter() + ":" + mensaje.getMessage());
-               buf.write("\n");
-               buf.close();
+               chatActual.append(mensaje.getWriter()).append(":").append(mensaje.getMessage()).append("---");
            }
-           //manager.escritura(nombreFichero, respuesta);
-           return "";
+           if (contenidoPrevio.length() < chatActual.toString().length()) {
+               contenidoPrevio = chatActual.toString();
+               actualizaPantalla(contenidoPrevio);
+           }
         }
     }
 
