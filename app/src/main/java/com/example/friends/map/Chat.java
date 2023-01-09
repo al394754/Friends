@@ -78,12 +78,11 @@ public class Chat extends AppCompatActivity {
 
 
 
-        System.out.println("Texto: " + contenidoPrevio);
 
-        String[] listadoMensajes = contenidoPrevio.split("---");
-        for(String mensaje: listadoMensajes){
-            chat.append(mensaje);
-        }
+        //String[] listadoMensajes = contenidoPrevio.split("---");
+        //for(String mensaje: listadoMensajes){
+          //  chat.append(mensaje);
+        //}
 
         enviar.setOnClickListener(new View.OnClickListener() { //Enviar mensaje
             @Override
@@ -102,17 +101,6 @@ public class Chat extends AppCompatActivity {
         lecturaAux = new LecturaAux();
         lecturaAux.execute((Void) null);
 
-        Runnable lect = () -> {
-
-            try {
-                actualizaPantalla(lectura(nombreFichero));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        };
-        ScheduledFuture<?> handler = mainScheduler.scheduleAtFixedRate(lect, 10, 10, TimeUnit.SECONDS);
-        Runnable parar = () -> handler.cancel(false);
-        mainScheduler.schedule(parar, 30, TimeUnit.MINUTES);
 
 
 
@@ -125,15 +113,15 @@ public class Chat extends AppCompatActivity {
             return;
         if(participantes.size() != 2)
             return;
-        contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
+        //contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
         envioAux = new EnvioAux(mensaje, nombreFichero);
         envioAux.execute((Void) null);
-        manager.escritura(nombreFichero, contenidoPrevio);
+        //manager.escritura(nombreFichero, contenidoPrevio);
     }
 
     public void iniciarChat() throws IOException, InterruptedException { //Iniciar la pantalla inicial con el chat
         nombreFichero = participantes.get(0) + ":" + participantes.get(1);
-        contenidoPrevio = lectura(nombreFichero);
+        //contenidoPrevio = lectura(nombreFichero);
     }
 
     public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
@@ -144,11 +132,28 @@ public class Chat extends AppCompatActivity {
             }
         })).start();*/
         //chat.setText(texto);
-        String[] chatCompleto = texto.split("---");
-        for (String mensaje: chatCompleto){
-            chat.append(mensaje);
+        //chat.setText(texto);
+        chat.setText(texto);
+        chat.invalidate();
+        //if(chatCompleto.length > 0){
+            try{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ;
+                        //for (String mensaje: chatCompleto) {
+                            //chat.append("\n" + mensaje);
+                        //}chat.invalidate();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        //}
+        //for (String mensaje: chatCompleto){
+          //  chat.append("\n" + mensaje);
         }
-    }
+
 
 
     public String lectura(String nombreFichero) throws IOException { //Leer localmente para enviar por pantalla
@@ -267,7 +272,7 @@ public class Chat extends AppCompatActivity {
                 }
 
             };
-            ScheduledFuture<?> handler = scheduler.scheduleAtFixedRate(lect, 10, 10, TimeUnit.SECONDS);
+            ScheduledFuture<?> handler = scheduler.scheduleAtFixedRate(lect, 3, 3, TimeUnit.SECONDS);
             Runnable parar = () -> handler.cancel(false);
             scheduler.schedule(parar, 30, TimeUnit.MINUTES);
 
@@ -281,13 +286,13 @@ public class Chat extends AppCompatActivity {
 
         public void lecturaExterior() throws IOException, JSONException { //Lee del sheet y almacena localmente
            List<Message> mensajes = HttpsRequest.getChat(participantes.get(0), participantes.get(1));
-           System.out.println("Cantidad de mensajes: " + mensajes.size());
            Message mensaje = new Message();
            StringBuilder chatActual = new StringBuilder();
            for(int i = 0; i < mensajes.size(); i++){
                mensaje = mensajes.get(i);
-               chatActual.append(mensaje.getWriter()).append(":").append(mensaje.getMessage()).append("---");
+               chatActual.append(mensaje.getWriter()).append(": ").append(mensaje.getMessage()).append("\n");
            }
+
            if (contenidoPrevio.length() < chatActual.toString().length()) {
                contenidoPrevio = chatActual.toString();
                actualizaPantalla(contenidoPrevio);
