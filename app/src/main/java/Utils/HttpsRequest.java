@@ -54,6 +54,7 @@ public class HttpsRequest {
             Message message = new Message();
             message.setWriter(jsonArray.getString(i++));
             message.setMessage(jsonArray.getString(i++));
+            messages.add(message);
         }
         return messages;
     }
