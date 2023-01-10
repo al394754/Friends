@@ -2,6 +2,7 @@ package com.example.friends.map;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -48,6 +49,12 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
 
     }
 
+    public void actualizaVista(){
+        listado.invalidate();
+        aux = new SolicitudesAux();
+        aux.execute((Void) null);
+    }
+
     public static Solicitudes instancia() {
         return solicitudes;
     }
@@ -63,7 +70,6 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
 
             try {
                 listas = HttpsRequest.getRequestFriends(emailPersonal);
-                System.out.println(listas);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;

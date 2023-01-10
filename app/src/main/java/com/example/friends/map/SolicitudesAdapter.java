@@ -82,8 +82,10 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
                 rechazarAux.execute();
             }
         });
+
         return view;
     }
+
 
 
     private class SolicitudesAceptarAux extends AsyncTask<Void, Void, Boolean>{
@@ -102,6 +104,7 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
         @Override
         protected void onPostExecute(final Boolean success) {
             aceptarAux = null;
+            solicitudes.actualizaVista();
         }
 
         public void aceptarSolicitud(String emailSolicitante) throws JSONException, IOException {
@@ -127,6 +130,7 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
         @Override
         protected void onPostExecute(final Boolean success) {
             rechazarAux = null;
+            solicitudes.actualizaVista();
         }
 
         public void rechazarSolicitud(String emailSolicitante) throws JSONException, IOException {
