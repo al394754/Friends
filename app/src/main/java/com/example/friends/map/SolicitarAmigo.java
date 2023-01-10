@@ -2,9 +2,15 @@ package com.example.friends.map;
 
 import static Utils.HttpsRequest.requestFriend;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -14,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.friends.R;
+import com.example.friends.main_menu.MainMenuActivity;
 
 import org.json.JSONException;
 
@@ -27,7 +34,7 @@ public class SolicitarAmigo extends AppCompatActivity {
     private String emailPersonal;
     public static int posible;
     private SolicitarAux aux;
-
+    private View mProgressView;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +47,38 @@ public class SolicitarAmigo extends AppCompatActivity {
         if (extras != null){
             emailPersonal = extras.getString("EMAIL");
         }
+        mProgressView = findViewById(R.id.request_progress);
 
     }
-    public void onClickCheckUser(View view) throws ExecutionException, InterruptedException { checkUser(); }
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+    public void onClickCheckUser(View view) throws ExecutionException, InterruptedException {
+        showProgress(true);
+        Log.d("Barra", "Mostrar barra");
+        checkUser();}
     private void checkUser() throws InterruptedException, ExecutionException {
         String emailUsuario = email.getText().toString();
         if(emailUsuario.compareTo("") == 0) {
@@ -54,25 +90,11 @@ public class SolicitarAmigo extends AppCompatActivity {
                 Toast toast = Toast.makeText(getApplicationContext(), "No puede agregarse a si mismo", Toast.LENGTH_SHORT);
                 toast.show();
             } else {
+                showProgress(true);
                 aux = new SolicitarAux(emailUsuario);
-                aux.execute((Void) null).get();
-                switch (posible) {
-                    case 0:
-                        Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
-                        toast.show();
-                        break;
-                    case 1:
-                        email.setError("No existe dicho usuario");
-                        break;
-                    case 2:
-                        email.setError("Este usuario ya ha recibido una solicitud suya");
-                        break;
-                    case 3:
-                        email.setError("Este usuario ya es amigo suyo");
-                        break;
-                }
+                aux.execute((Void) null);
             }
-        }email.setText("");
+        }
         aux = null;
     }
     @SuppressLint("StaticFieldLeak")
@@ -95,7 +117,26 @@ public class SolicitarAmigo extends AppCompatActivity {
             }
             return null;
         }
-
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            showProgress(false);
+            switch (posible) {
+                case 0:
+                    Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
+                    toast.show();
+                    break;
+                case 1:
+                    email.setError("No existe dicho usuario");
+                    break;
+                case 2:
+                    email.setError("Este usuario ya ha recibido una solicitud suya");
+                    break;
+                case 3:
+                    email.setError("Este usuario ya es amigo suyo");
+                    break;
+            }
+            email.setText("");
+        }
         private void existeUsuario(String emailUsario) throws JSONException, IOException { //Mediante HTTP comprueba si el email existe y si es o no amigo
             //0 = existe, 1 = no existe, 2 = existe pero ha recibido solicitud, 3 = existe pero ya es amigo
             posible = requestFriend(emailPersonal, emailUsario);

@@ -20,4 +20,7 @@
     <string name="error_invalid_name">Invalid name</string>
     <string name="error_invalid_surname">Invalid surname</string>
     <string name="error_incorrect_password">Error incorrect email/password</string>
+    <string name="new_game">PEPE</string>
+    <string name="help" />
+    <string name="descr_overflow_button">pepe</string>
 </resources>

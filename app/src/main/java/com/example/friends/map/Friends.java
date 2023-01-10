@@ -1,8 +1,12 @@
 package com.example.friends.map;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.AsyncTask;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +36,7 @@ public class Friends extends AppCompatActivity{
     private ListView listado;
     private Button buscarAmigo;
     private Button verSolicitudes;
-
+    private View mProgressView;
     private static Friends friend;
 
     private FriendsAdapter adapter;
@@ -56,18 +60,47 @@ public class Friends extends AppCompatActivity{
         listado = (ListView) findViewById(R.id.listViewSolicitudes);
         buscarAmigo = (Button) findViewById(R.id.buscarAmigos);
         verSolicitudes = (Button) findViewById(R.id.solicitudesAmigos);
-
+        mProgressView = findViewById(R.id.request_progress);
+        showProgress(true);
         access = new AccessFriends();
-        try {
-            access.execute((Void) null).get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        access.execute((Void) null);
 
     }
+    /**
+     * Shows the progress UI and hides the login form.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
+            listado.setVisibility(show ? View.GONE : View.VISIBLE);
+            listado.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    listado.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            listado.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
     public void onClickBuscarButton(View view){ buscarEmailAmigo(emailPersonal); }
     public void onClickSolicitudesButton(View view){ consultarSolicitudes(emailPersonal); }
 
@@ -119,6 +152,7 @@ public class Friends extends AppCompatActivity{
             }else{
                 System.out.println("Error");
             }
+            showProgress(false);
         }
 
     }
