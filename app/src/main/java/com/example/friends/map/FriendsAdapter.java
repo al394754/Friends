@@ -65,13 +65,14 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         TextView amigo = (TextView) view.findViewById(R.id.amigo);
         amigo.setText(amigos.get(pos));
 
-        correoAmigo = amigos.get(pos);
 
         Button chat = (Button) view.findViewById(R.id.chat);
         chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                correoAmigo = amigos.get(pos);
                 abrirChat(emailPropio);
+
             }
         });
 
@@ -79,6 +80,7 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                correoAmigo = amigos.get(pos);
                 abrirMapa(emailPropio);
             }
         });
@@ -86,10 +88,7 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         return view;
     }
 
-
-
     public void abrirMapa(String emailPropio){
-        correoAmigo = getCorreoAmigo();
         Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         intent.putExtra("EMAIL_AMIGO", correoAmigo);
@@ -97,16 +96,10 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
     }
 
     public void abrirChat(String emailPropio){
-        correoAmigo = getCorreoAmigo();
         Intent intent = new Intent(context, Chat.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         intent.putExtra("EMAIL_AMIGO", correoAmigo);
         friends.startActivity(intent);
     }
-
-    public String getCorreoAmigo(){
-        return correoAmigo;
-    }
-
 
 }

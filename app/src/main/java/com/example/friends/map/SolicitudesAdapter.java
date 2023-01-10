@@ -103,8 +103,9 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            aceptarAux = null;
             solicitudes.actualizaVista();
+            solicitudes.mensajePorPantalla(true);
+            aceptarAux = null;
         }
 
         public void aceptarSolicitud(String emailSolicitante) throws JSONException, IOException {
@@ -129,8 +130,9 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            rechazarAux = null;
             solicitudes.actualizaVista();
+            solicitudes.mensajePorPantalla(false);
+            rechazarAux = null;
         }
 
         public void rechazarSolicitud(String emailSolicitante) throws JSONException, IOException {

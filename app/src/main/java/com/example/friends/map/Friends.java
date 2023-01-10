@@ -7,10 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -27,7 +27,6 @@ public class Friends extends AppCompatActivity{
 
     private ArrayList<String> friendEmails = new ArrayList<String>(); //Listado de todos los amigos
     private String emailPersonal; //Usado como segundo email para mapa y chat
-    private String correoAmigo;
     private AccessFriends access = null;
 
     private ListView listado;
@@ -54,15 +53,10 @@ public class Friends extends AppCompatActivity{
             emailPersonal = extras.getString("EMAIL");
         }
 
-        //emailPersonal = "alexManea@gmail.com";
-
-        listado = (ListView) findViewById(R.id.listView);
+        listado = (ListView) findViewById(R.id.listViewSolicitudes);
         buscarAmigo = (Button) findViewById(R.id.buscarAmigos);
         verSolicitudes = (Button) findViewById(R.id.solicitudesAmigos);
 
-        //adapter = new FriendsAdapter(emailPersonal, amigos, getApplicationContext());
-
-        //emailPersonal = getIntent().getStringExtra("EMAIL");
         access = new AccessFriends();
         try {
             access.execute((Void) null).get();
@@ -103,8 +97,6 @@ public class Friends extends AppCompatActivity{
         protected Boolean doInBackground(Void... voids) {
             List<List<String>> listas;
             try {
-                //TODO: Haz lo de los nombres
-                //Lo he arreglado para que te devuelva dos listas
                 listas = HttpsRequest.getFriends(emailPersonal);
 
             } catch (IOException e) {
@@ -133,10 +125,3 @@ public class Friends extends AppCompatActivity{
 
 
 }
-
-
-
-
-//https://stackoverflow.com/questions/36787562/adding-a-button-to-each-row-of-a-list-view-in-android --> Listado
-//https://stackoverflow.com/questions/40862154/how-to-create-listview-items-button-in-each-row
-//https://www.youtube.com/watch?v=rN7x3ovWepM

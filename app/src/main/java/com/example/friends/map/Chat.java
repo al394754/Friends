@@ -7,9 +7,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -49,7 +51,10 @@ public class Chat extends AppCompatActivity {
 
     private TextView chat;
     private EditText entrada;
+    private ProgressBar progressBar;
     Button enviar;
+
+    private ScheduledFuture<?> handler;
 
     List<String> participantes; //los dos participantes para formar el nombre del fichero
     ChatManager manager;
@@ -60,29 +65,29 @@ public class Chat extends AppCompatActivity {
     String contenidoPrevio = "";
 
 
-    private final ScheduledExecutorService mainScheduler = Executors.newScheduledThreadPool(1);
-
+    @Override
+    public void onBackPressed(){ //Con esto paramos la lectura periódica cuando volvemos hacia atrás
+        super.onBackPressed();
+        handler.cancel(true);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+
         chat = (TextView) findViewById(R.id.chatLocal);
+        chat.setMovementMethod(new ScrollingMovementMethod());
         entrada = (EditText) findViewById(R.id.entrada);
         enviar = (Button) findViewById(R.id.enviar);
+        progressBar = (ProgressBar) findViewById(R.id.progressBarChat);
 
+        lecturaAux = new LecturaAux();
+        lecturaAux.execute((Void) null);
 
         manager = new ChatManager();
         manager.execute((Void) null);
-
-
-
-
-        //String[] listadoMensajes = contenidoPrevio.split("---");
-        //for(String mensaje: listadoMensajes){
-          //  chat.append(mensaje);
-        //}
 
         enviar.setOnClickListener(new View.OnClickListener() { //Enviar mensaje
             @Override
@@ -97,13 +102,6 @@ public class Chat extends AppCompatActivity {
             }
         });
 
-
-        lecturaAux = new LecturaAux();
-        lecturaAux.execute((Void) null);
-
-
-
-
     }
 
 
@@ -113,65 +111,15 @@ public class Chat extends AppCompatActivity {
             return;
         if(participantes.size() != 2)
             return;
-        //contenidoPrevio = contenidoPrevio + "\n" + participantes.get(0) + ": " + mensaje; //Deberá aparecer como: Alex: Hola, Adrián: Hola....
         envioAux = new EnvioAux(mensaje, nombreFichero);
         envioAux.execute((Void) null);
-        //manager.escritura(nombreFichero, contenidoPrevio);
-    }
-
-    public void iniciarChat() throws IOException, InterruptedException { //Iniciar la pantalla inicial con el chat
-        nombreFichero = participantes.get(0) + ":" + participantes.get(1);
-        //contenidoPrevio = lectura(nombreFichero);
     }
 
     public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
-        /*new Thread(() -> runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                chat.setText(texto);
-            }
-        })).start();*/
-        //chat.setText(texto);
-        //chat.setText(texto);
         chat.setText(texto);
         chat.invalidate();
-        //if(chatCompleto.length > 0){
-            try{
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ;
-                        //for (String mensaje: chatCompleto) {
-                            //chat.append("\n" + mensaje);
-                        //}chat.invalidate();
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        //}
-        //for (String mensaje: chatCompleto){
-          //  chat.append("\n" + mensaje);
-        }
-
-
-
-    public String lectura(String nombreFichero) throws IOException { //Leer localmente para enviar por pantalla
-        File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
-        StringBuilder texto = new StringBuilder();
-        try {
-            BufferedReader buf = new BufferedReader(new FileReader(file));
-            String linea;
-            while ((linea = buf.readLine()) != null) {
-                texto.append(linea);
-                texto.append("\n");
-            }
-            buf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }return texto.toString();
+        progressBar.setVisibility(View.GONE);
     }
-
 
 
     public class ChatManager extends AsyncTask<Void, Void, Boolean> { //Leer/Escribir localmente
@@ -179,31 +127,7 @@ public class Chat extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... voids) {
             participantes = obtenerParticipantes();
-
-            try {
-                iniciarChat();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
             return true;
-        }
-
-
-
-
-        public String escritura(String nombreFichero, String mensaje) throws IOException, JSONException {  //Se necesita almacenar igualmente en fichero, no podemos eliminar
-            File file = new File(getApplicationContext().getFilesDir(), nombreFichero); //Abrimos el fichero nuevo
-            System.out.println(file.toPath());
-            try {
-                BufferedWriter buf = new BufferedWriter(new FileWriter(file));
-                buf.write(mensaje);
-                buf.write("---");
-                buf.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return mensaje + "\n";
         }
 
 
@@ -216,6 +140,7 @@ public class Chat extends AppCompatActivity {
                     participantes.add(extras.getString("EMAIL_AMIGO"));
                 }
             }
+            System.out.println("Participantes: " + participantes);
             return participantes;
         }
         @Override
@@ -237,9 +162,6 @@ public class Chat extends AppCompatActivity {
         protected Boolean doInBackground(Void... voids) { //Mando fuera y escribo local --> Leo local --> Actualizo pantalla
             try {
                 escrituraExterior(mensaje);
-                //manager.escritura(nombreFichero, mensaje);
-                //String nuevoContenido = manager.lectura(nombreFichero);
-                //actualizaPantalla(nuevoContenido);
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
                 return false;
@@ -272,7 +194,7 @@ public class Chat extends AppCompatActivity {
                 }
 
             };
-            ScheduledFuture<?> handler = scheduler.scheduleAtFixedRate(lect, 3, 3, TimeUnit.SECONDS);
+            handler = scheduler.scheduleAtFixedRate(lect, 3, 3, TimeUnit.SECONDS);
             Runnable parar = () -> handler.cancel(false);
             scheduler.schedule(parar, 30, TimeUnit.MINUTES);
 

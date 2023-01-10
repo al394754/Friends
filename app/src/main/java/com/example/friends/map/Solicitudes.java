@@ -2,9 +2,12 @@ package com.example.friends.map;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +32,7 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
     private ListView listado;
 
     private static Solicitudes solicitudes;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,11 +46,23 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
             emailPersonal = extras.getString("EMAIL");
         }
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBarSolicitudes);
+        progressBar.setVisibility(View.VISIBLE);
         listado = (ListView) findViewById(R.id.listViewSolicitudes);
 
         aux = new SolicitudesAux();
         aux.execute((Void) null);
 
+    }
+
+    public void mensajePorPantalla(boolean resultado){
+        if(resultado){
+            Toast toast = Toast.makeText(getApplicationContext(), "Petición aceptada", Toast.LENGTH_LONG);
+            toast.show();
+        }else{
+            Toast toast = Toast.makeText(getApplicationContext(), "Petición rechazada", Toast.LENGTH_LONG);
+            toast.show();
+        }
     }
 
     public void actualizaVista(){
@@ -67,9 +83,17 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
         @Override
         protected Boolean doInBackground(Void... voids) {
             List<List<String>> listas;
-
             try {
                 listas = HttpsRequest.getRequestFriends(emailPersonal);
+                if(listas.get(0).size() == 0){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast toast = Toast.makeText(getApplicationContext(), "No tiene solicitudes pendientes", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    });
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -88,6 +112,7 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
             if (success) {
                 adapter = new SolicitudesAdapter(emailPersonal, friendEmails, getApplicationContext());
                 listado.setAdapter(adapter);
+                progressBar.setVisibility(View.GONE);
             } else {
                 System.out.println("Error");
             }

@@ -144,25 +144,6 @@ public class MapsActivity extends AppCompatActivity
         Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
 
-
-//    @Override
-//    protected void onResumeFragments() {
-//        super.onResumeFragments();
-//        if (permissionDenied) {
-//            // Permission was not granted, display error dialog.
-//            //showMissingPermissionError();
-//            permissionDenied = false;
-//        }
-//    }
-
-    /*
-     * Displays a dialog with error message explaining that the location permission is missing.
-     */
-        /*private void showMissingPermissionError() {
-        PermissionUtils.PermissionDeniedDialog
-                .newInstance(true).show(getSupportFragmentManager(), "dialog");
-    }*/
-
     /**
      * Ask the user for permissions needed
      */
@@ -264,7 +245,6 @@ public class MapsActivity extends AppCompatActivity
                     initiate();
                 } else {
                     Log.d("RequestLocation", "User did not enable Location");
-                    //showMissingPermissionError();
                     finish();
                 }
         }
@@ -297,8 +277,6 @@ public class MapsActivity extends AppCompatActivity
                 e.printStackTrace();
                 return false;
             }
-            //System.out.println(cadena);
-            //amigos.addAll(Arrays.asList(cadena.replace("[", "").replace("]", "").replace("\"", "").split(","))); //pasar la cadena que obtenemos a lista
             return true;
         }
 
