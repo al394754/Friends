@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -63,7 +64,13 @@ public class Friends extends AppCompatActivity{
 
         //emailPersonal = getIntent().getStringExtra("EMAIL");
         access = new AccessFriends();
-        access.execute((Void) null);
+        try {
+            access.execute((Void) null).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 
