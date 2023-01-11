@@ -144,6 +144,7 @@ public class MapsActivity extends AppCompatActivity
         Toast.makeText(this, "Current location:\n" + location, Toast.LENGTH_LONG).show();
     }
 
+
     /**
      * Ask the user for permissions needed
      */

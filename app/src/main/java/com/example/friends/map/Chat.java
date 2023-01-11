@@ -79,15 +79,15 @@ public class Chat extends AppCompatActivity {
 
         chat = (TextView) findViewById(R.id.chatLocal);
         chat.setMovementMethod(new ScrollingMovementMethod());
+        chat.setText("Cargando mensajes...");
         entrada = (EditText) findViewById(R.id.entrada);
         enviar = (Button) findViewById(R.id.enviar);
-        progressBar = (ProgressBar) findViewById(R.id.progressBarChat);
-
-        lecturaAux = new LecturaAux();
-        lecturaAux.execute((Void) null);
 
         manager = new ChatManager();
         manager.execute((Void) null);
+
+        lecturaAux = new LecturaAux();
+        lecturaAux.execute((Void) null);
 
         enviar.setOnClickListener(new View.OnClickListener() { //Enviar mensaje
             @Override
@@ -118,6 +118,10 @@ public class Chat extends AppCompatActivity {
     public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
         chat.setText(texto);
         chat.invalidate();
+        //progressBar.setVisibility(View.GONE);
+    }
+
+    public void eliminarCargando(){
         progressBar.setVisibility(View.GONE);
     }
 
@@ -140,7 +144,6 @@ public class Chat extends AppCompatActivity {
                     participantes.add(extras.getString("EMAIL_AMIGO"));
                 }
             }
-            System.out.println("Participantes: " + participantes);
             return participantes;
         }
         @Override
@@ -188,7 +191,7 @@ public class Chat extends AppCompatActivity {
 
             Runnable lect = () -> {
                 try {
-                    lecturaExterior(); //primero leemos de fuera
+                    lecturaExterior();
                 } catch (IOException | JSONException e) {
                     e.printStackTrace();
                 }
@@ -196,8 +199,7 @@ public class Chat extends AppCompatActivity {
             };
             handler = scheduler.scheduleAtFixedRate(lect, 3, 3, TimeUnit.SECONDS);
             Runnable parar = () -> handler.cancel(false);
-            scheduler.schedule(parar, 30, TimeUnit.MINUTES);
-
+            scheduler.schedule(parar, 10, TimeUnit.MINUTES);
             return true;
         }
 
