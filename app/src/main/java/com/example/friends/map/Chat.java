@@ -184,7 +184,7 @@ public class Chat extends AppCompatActivity {
     }
     public class LecturaAux extends AsyncTask<Void, Void, Boolean>{
 
-        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); //Se usará para actualizar el chat periodicamente
 
         @Override
         protected Boolean doInBackground(Void... voids) { //Espera 10 segundos entre lectura y lectura, al cabo de 30 minutos finaliza la ejecución
@@ -197,7 +197,7 @@ public class Chat extends AppCompatActivity {
                 }
 
             };
-            handler = scheduler.scheduleAtFixedRate(lect, 3, 3, TimeUnit.SECONDS);
+            handler = scheduler.scheduleAtFixedRate(lect, 2, 2, TimeUnit.SECONDS);
             Runnable parar = () -> handler.cancel(false);
             scheduler.schedule(parar, 10, TimeUnit.MINUTES);
             return true;
