@@ -4,6 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Map;
 
+/**
+ * Clase encargada de generar la query-String de las peticiones HTTP
+ */
 public class ParameterStringBuilder {
     public static String getParamsString(Map<String, String> params)
             throws UnsupportedEncodingException {

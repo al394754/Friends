@@ -45,16 +45,16 @@ import Utils.AESCrypt;
 import Utils.HttpsRequest;
 
 /**
- * A login screen that offers login via email/password.
+ * Actividad que se encarga de iniciar sesión.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
         /**
-         * Id to identity READ_CONTACTS permission request.
+         * Id de permisos de contactos
          */
         private static final int REQUEST_READ_CONTACTS = 0;
 
         /**
-         * Keep track of the login task to ensure we can cancel it if requested.
+         * Clase encarga de procesar el inicio de sesión
          */
         private UserLoginTask mAuthTask = null;
 
@@ -97,7 +97,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         getLoaderManager().initLoader(0, null, this);
         }
-
+        /**
+        * Petición para pedir al usuario leer sus contactos, se utiliza para que el teclado muestre sugerencias
+        * @return si se conceder el permiso**/
         private boolean mayRequestContacts() {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                         return true;
@@ -121,7 +123,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         /**
-         * Callback received when a permissions request has been completed.
+         * Callback llamado en la respuesta a los permisos
          */
         @Override
         public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -136,9 +138,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
                 /**
-                 * Attempts to sign in or register the account specified by the login form.
-                 * If there are form errors (invalid email, missing fields, etc.), the
-                 * errors are presented and no actual login attempt is made.
+                 * Comprueba se el inicio de sesión es válido, comprobando que no hay campos vacíos,
+                 * comprobando es un correo válido
                  */
         private void attemptLogin() {
                 if (mAuthTask != null) {
@@ -200,7 +201,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         /**
-         * Shows the progress UI and hides the login form.
+         * Se encarga de crear una barra de carga mientras se procesa la solicitud
          */
         @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
         private void showProgress(final boolean show) {
@@ -290,8 +291,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         /**
-         * Represents an asynchronous login/registration task used to authenticate
-         * the user.
+         * Crea la petición HTTP asíncronamente para realizar el login en el sistema, también
+         * encripta la contraseña
          */
         public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
                 private final String mEmail;

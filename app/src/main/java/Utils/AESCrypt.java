@@ -28,6 +28,12 @@ public class AESCrypt
 
     }
 
+    /**
+     * Desencripta un mensaje utilizando KEY. Si el mensaje se ha encriptado con la misma clave este será visible
+     * @param value
+     * @return
+     * @throws Exception
+     */
     public static String decrypt(String value) throws Exception
     {
         Key key = generateKey();
@@ -40,6 +46,11 @@ public class AESCrypt
 
     }
 
+    /**
+     * Crea la clave que se va a utilizar para encriptar/desencriptar
+     * @return
+     * @throws Exception
+     */
     private static Key generateKey() throws Exception
     {
         Key key = new SecretKeySpec(AESCrypt.KEY.getBytes(),AESCrypt.ALGORITHM);

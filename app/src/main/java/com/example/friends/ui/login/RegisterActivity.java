@@ -43,7 +43,7 @@ import Utils.AESCrypt;
 import Utils.HttpsRequest;
 
 /**
- * A Register screen.
+ * Actividad que se encarga de realizar el registro en la aplicación
  */
 public class RegisterActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
     /**
@@ -52,7 +52,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
-     * Keep track of the register task to ensure we can cancel it if requested.
+     * Clase encarga de procesar el registro
      */
     private UserRegisterTask mAuthTask = null;
 
@@ -91,8 +91,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     }
 
     /**
-     * Request the user the permits to read contacts needed for autocomplete
-     * @return if the user permits read contacts
+     * Petición para pedir al usuario leer sus contactos, se utiliza para que el teclado muestre sugerencias
+     * @return si se conceder el permiso
      */
     private boolean mayRequestContacts() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -117,7 +117,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     }
 
     /**
-     * Callback received when a permissions request has been completed.
+     * Callback para pedir permisos
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
@@ -132,9 +132,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
 
 
     /**
-     * Attempts to sign in or register the account specified by the register form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual register attempt is made.
+     * Comprueba se el registro n es válido, comprobando que no hay campos vacíos,
+     * comprobando es un correo válido
      */
     private void attemptRegister() {
         if (mAuthTask != null) {
@@ -222,7 +221,7 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     }
 
     /**
-     * Shows the progress UI and hides the register form.
+     * Se encarga de crear una barra de carga mientras se procesa la solicitud
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
@@ -312,8 +311,8 @@ public class RegisterActivity extends AppCompatActivity implements LoaderCallbac
     }
 
     /**
-     * Represents an asynchronous registration task used to authenticate
-     * the user.
+     * Crea la petición HTTP asíncronamente para realizar el login en el sistema, también
+     * encripta la contraseña
      */
     public class UserRegisterTask extends AsyncTask<Void, Void, Boolean> {
         private final String mEmail;

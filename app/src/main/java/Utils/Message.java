@@ -1,5 +1,8 @@
 package Utils;
 
+/**
+ * Clase que permite almacenar mensajes y su autor.
+ */
 public class Message {
     private String message;
     private String writer;

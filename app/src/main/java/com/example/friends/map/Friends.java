@@ -67,6 +67,10 @@ public class Friends extends AppCompatActivity{
         access.execute((Void) null);
 
     }
+    public void onDestroy() {
+        super.onDestroy();
+        HttpsRequest.finishSession();
+    }
     /**
      * Shows the progress UI and hides the login form.
      */
