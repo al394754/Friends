@@ -67,6 +67,15 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
 
 
         Button chat = (Button) view.findViewById(R.id.chat);
+        Button borrarAmigo = (Button) view.findViewById(R.id.borrar);
+        borrarAmigo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                correoAmigo = amigos.get(pos);
+                borrarAmigo(emailPropio);
+
+            }
+        });
         chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,7 +96,9 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
 
         return view;
     }
-
+    public void borrarAmigo(String emailPropio){
+        new RemoveFriend(emailPropio,correoAmigo).execute();
+    }
     public void abrirMapa(String emailPropio){
         Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
@@ -101,5 +112,33 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         intent.putExtra("EMAIL_AMIGO", correoAmigo);
         friends.startActivity(intent);
     }
+    public class RemoveFriend extends AsyncTask<Void, Void, Boolean> {
 
+        private String emailAmigo;
+        private String emailPropio = "";
+
+        RemoveFriend(String emailUser, String emailAmigo) {
+            this.emailAmigo = emailAmigo;
+            this.emailPropio = emailUser;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+
+            try {
+                return HttpsRequest.removeFriend(emailPropio,emailAmigo);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            //TODO actualizar pantalla
+        }
+    }
 }

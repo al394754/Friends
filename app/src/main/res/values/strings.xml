@@ -23,4 +23,8 @@
     <string name="new_game">PEPE</string>
     <string name="help" />
     <string name="descr_overflow_button">pepe</string>
+    <string name="mapa">Mapa</string>
+    <string name="chat">Chat</string>
+    <string name="borrarAmigo">Eliminar amigo</string>
+    <string name="email">emailEjemplo@gmail.com</string>
 </resources>

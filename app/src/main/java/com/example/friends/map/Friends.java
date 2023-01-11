@@ -42,6 +42,7 @@ public class Friends extends AppCompatActivity{
     private FriendsAdapter adapter;
     public void onPostResume() {
         super.onPostResume();
+        showProgress(true);
         access = new AccessFriends();
         access.execute((Void) null);
     }

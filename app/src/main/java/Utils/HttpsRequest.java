@@ -101,6 +101,16 @@ public class HttpsRequest {
         String JsonString = httpRequest.getResponse();
         JSONObject object = new JSONObject(JsonString);
         return object.getInt("ResponseRequest");       }
+    public static boolean removeFriend(String userEmail,String emailFriend) throws IOException, JSONException {
+        HttpsRequest httpRequest = new HttpsRequest(URL_DB);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("ACTION","REMOVEFRIEND");
+        parameters.put("EMAIL",userEmail);
+        parameters.put("FRIENDEMAIL",emailFriend);
+        httpRequest.createPOSTRequest(parameters);
+        String JsonString = httpRequest.getResponse();
+        JSONObject object = new JSONObject(JsonString);
+        return object.getBoolean("ResponseRemove");       }
     public static List<List<String>> getFriends(String email) throws IOException, JSONException {
         Log.d("Get Friends: ", email);
         HttpsRequest httpRequest = new HttpsRequest(URL_DB);
