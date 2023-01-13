@@ -89,12 +89,12 @@ public class SolicitarAmigo extends AppCompatActivity {
     private void checkUser() throws InterruptedException, ExecutionException {
         String emailUsuario = email.getText().toString();
         if(emailUsuario.compareTo("") == 0) {
-            Toast toast = Toast.makeText(getApplicationContext(), "Debe introducir un usuario", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getApplicationContext(), "You must enter a user", Toast.LENGTH_SHORT);
             toast.show();
         }
         else {
             if (emailUsuario.compareTo(emailPersonal) == 0) {
-                Toast toast = Toast.makeText(getApplicationContext(), "No puede agregarse a si mismo", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), "Cannot add itself", Toast.LENGTH_SHORT);
                 toast.show();
             } else {
                 showProgress(true);
@@ -133,17 +133,17 @@ public class SolicitarAmigo extends AppCompatActivity {
             showProgress(false);
             switch (posible) {
                 case 0:
-                    Toast toast = Toast.makeText(getApplicationContext(), "Solicitud de amistad enviada", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(getApplicationContext(), "Friend request sent", Toast.LENGTH_SHORT);
                     toast.show();
                     break;
                 case 1:
-                    email.setError("No existe dicho usuario");
+                    email.setError("No such user");
                     break;
                 case 2:
-                    email.setError("Este usuario ya ha recibido una solicitud suya");
+                    email.setError("This user has already received a request from you");
                     break;
                 case 3:
-                    email.setError("Este usuario ya es amigo suyo");
+                    email.setError("This user is already a friend of yours");
                     break;
             }
             email.setText("");

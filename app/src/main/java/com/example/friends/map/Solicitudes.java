@@ -61,10 +61,10 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
      */
     public void mensajePorPantalla(boolean resultado){
         if(resultado){
-            Toast toast = Toast.makeText(getApplicationContext(), "Petición aceptada", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(getApplicationContext(), "Request accepted", Toast.LENGTH_LONG);
             toast.show();
         }else{
-            Toast toast = Toast.makeText(getApplicationContext(), "Petición rechazada", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(getApplicationContext(), "Petition rejected", Toast.LENGTH_LONG);
             toast.show();
         }
     }
@@ -99,7 +99,7 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast toast = Toast.makeText(getApplicationContext(), "No tiene solicitudes pendientes", Toast.LENGTH_LONG);
+                            Toast toast = Toast.makeText(getApplicationContext(), "You have no pending requests", Toast.LENGTH_LONG);
                             toast.show();
                         }
                     });

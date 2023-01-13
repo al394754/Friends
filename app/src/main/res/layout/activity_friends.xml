@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buscarAmigos"
+        app:layout_constraintTop_toBottomOf="@+id/botones"
         android:layout_marginStart="19dp"
   />
     <ListView
@@ -33,29 +33,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buscarAmigos"
+        app:layout_constraintTop_toBottomOf="@+id/botones"
         app:layout_constraintVertical_bias="0.914" />
-
-    <Button
-        android:id="@+id/buscarAmigos"
+    <LinearLayout
+        android:id="@+id/botones"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="37dp"
-        android:onClick="onClickBuscarButton"
-        android:text="Buscar"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent" >
+        <Button
+            android:id="@+id/buscarAmigos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClickBuscarButton"
+            android:text="@string/FindOption" />
 
-    <Button
-        android:id="@+id/solicitudesAmigos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="37dp"
-        android:layout_marginEnd="22dp"
-        android:onClick="onClickSolicitudesButton"
-        android:text="Solicitudes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Button
+            android:id="@+id/solicitudesAmigos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onClickSolicitudesButton"
+            android:text="@string/RequestOption" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

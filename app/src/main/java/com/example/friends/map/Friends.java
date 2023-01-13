@@ -81,7 +81,7 @@ public class Friends extends AppCompatActivity{
         access.execute((Void) null);
         listado.invalidate();
         if(friendEmails.size() == 0){
-            Toast toast = Toast.makeText(getApplicationContext(), "No tiene amigos agregados", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(getApplicationContext(), "You have no friends added", Toast.LENGTH_LONG);
             toast.show();
         }
     }
@@ -90,7 +90,7 @@ public class Friends extends AppCompatActivity{
      * Feedback donde indica que se ha eliminado el enemigo
      */
     public void mensajePorPantalla(){
-        Toast toast = Toast.makeText(getApplicationContext(), "Amigo eliminado", Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(getApplicationContext(), "Deleted friend", Toast.LENGTH_LONG);
         toast.show();
     }
     /**
@@ -189,7 +189,7 @@ public class Friends extends AppCompatActivity{
                 adapter = new FriendsAdapter(emailPersonal, friendEmails, getApplicationContext());
                 listado.setAdapter(adapter);
                 if(friendEmails.size() == 0){
-                    Toast toast = Toast.makeText(getApplicationContext(), "No tiene amigos agregados", Toast.LENGTH_LONG);
+                    Toast toast = Toast.makeText(getApplicationContext(), "You have no friends added", Toast.LENGTH_LONG);
                     toast.show();
                 }
             }else{

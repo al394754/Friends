@@ -133,7 +133,6 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
         // Return false so that we don't consume the event and the default behavior still occurs
         // (the camera animates to the user's current position).
         return false;
@@ -287,7 +286,7 @@ public class MapsActivity extends AppCompatActivity
             if (success && cadena.compareTo("") != 0) //Segunda condicion comprueba si hay algún email de amigo
                 creaCoordenadas(cadena);
             else
-                System.out.println("Error coordenadas");
+                System.out.println("Error coordinates");
         }
     }
 

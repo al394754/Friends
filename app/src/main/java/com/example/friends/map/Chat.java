@@ -240,7 +240,7 @@ public class Chat extends AppCompatActivity {
                actualizaPantalla(contenidoPrevio);
            }
            if(chatActual.length() == 0){
-               actualizaPantalla("Aún no hay mensajes en esta conversación.");
+               actualizaPantalla("There are no messages in this conversation yet");
            }
         }
     }
