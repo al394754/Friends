@@ -30,7 +30,7 @@
     <string name="mapOption">Show me on the map</string>
     <string name="friendOption">Friend list</string>
     <string name="FindOption">Find new Friends</string>
-    <string name="RequestOption">See Friend requests</string>
+    <string name="RequestOption">Show Friend requests</string>
     <string name="send">Send request</string>
     <string name="DeclineOption">"Decline "</string>
     <string name="AcceptOption">Accept</string>
