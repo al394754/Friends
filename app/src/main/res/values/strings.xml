@@ -34,4 +34,5 @@
     <string name="send">Send request</string>
     <string name="DeclineOption">"Decline "</string>
     <string name="AcceptOption">Accept</string>
+    <string name="SendMessage">Send message</string>
 </resources>
