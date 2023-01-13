@@ -20,6 +20,9 @@ import java.util.List;
 
 import Utils.HttpsRequest;
 
+/**
+ * Clase empleada para mostrar cada línea del listado. Esto se utiliza ya que queremos asignar botones a cada petición por separado
+ */
 public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
     private List<String> solicitudesPendientes = new ArrayList<>();
     private String correoPersonal;
@@ -87,7 +90,9 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
     }
 
 
-
+    /**
+     * Manda una cadena HTTP para indicar que se ha aceptado la solicitud
+     */
     private class SolicitudesAceptarAux extends AsyncTask<Void, Void, Boolean>{
 
         @Override
@@ -115,6 +120,10 @@ public class SolicitudesAdapter extends BaseAdapter implements ListAdapter {
 
 
     }
+
+    /**
+     * Manda una cadena HTTP para indicar que se ha rechazado la solicitud
+     */
     private class SolicitudesRechazarAux extends AsyncTask<Void, Void, Boolean>{
 
         @Override

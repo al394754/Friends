@@ -55,6 +55,10 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
 
     }
 
+    /**
+     * Según el parametro, se muestra por pantalla un feedback acerca de si has aceptado o rechazado una petición de amistad
+     * @param resultado
+     */
     public void mensajePorPantalla(boolean resultado){
         if(resultado){
             Toast toast = Toast.makeText(getApplicationContext(), "Petición aceptada", Toast.LENGTH_LONG);
@@ -65,6 +69,9 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
         }
     }
 
+    /**
+     * Actualiza la pantalla cada vez que se borra una petición
+     */
     public void actualizaVista(){
         listado.invalidate();
         aux = new SolicitudesAux();
@@ -75,6 +82,9 @@ public class Solicitudes extends AppCompatActivity { //Igual que en el listado d
         return solicitudes;
     }
 
+    /**
+     * Clase encargada de obtener las solicitudes del Google Sheet
+     */
     public class SolicitudesAux extends AsyncTask<Void, Void, Boolean> {
 
         private List<String> friendEmails = new ArrayList<String>();

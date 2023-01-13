@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,6 +72,27 @@ public class Friends extends AppCompatActivity{
         super.onDestroy();
         HttpsRequest.finishSession();
     }
+
+    /**
+     * Actualiza la pantalla cada vez que se borra un amigo
+     */
+    public void actualizaPantalla(){
+        access = new AccessFriends();
+        access.execute((Void) null);
+        listado.invalidate();
+        if(friendEmails.size() == 0){
+            Toast toast = Toast.makeText(getApplicationContext(), "No tiene amigos agregados", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
+    /**
+     * Feedback donde indica que se ha eliminado el enemigo
+     */
+    public void mensajePorPantalla(){
+        Toast toast = Toast.makeText(getApplicationContext(), "Amigo eliminado", Toast.LENGTH_LONG);
+        toast.show();
+    }
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -115,17 +137,29 @@ public class Friends extends AppCompatActivity{
     }
 
 
+    /**
+     * Crea una actividad para buscar amigos
+     * @param emailPropio
+     */
     public void buscarEmailAmigo(String emailPropio){
         Intent intent = new Intent(getApplicationContext(), SolicitarAmigo.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         startActivity(intent);
     }
 
+    /**
+     * Crea una actividad para buscar solicitudes de amistad
+     * @param emailPropio
+     */
     public void consultarSolicitudes(String emailPropio){
         Intent intent = new Intent(getApplicationContext(), Solicitudes.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         startActivity(intent);
     }
+
+    /**
+     * Clase para obtener listado de amigos
+     */
     public class AccessFriends extends AsyncTask<Void, Void, Boolean> {
 
         private List<String> friendEmails = new ArrayList<String>();
@@ -154,6 +188,10 @@ public class Friends extends AppCompatActivity{
             if(success){
                 adapter = new FriendsAdapter(emailPersonal, friendEmails, getApplicationContext());
                 listado.setAdapter(adapter);
+                if(friendEmails.size() == 0){
+                    Toast toast = Toast.makeText(getApplicationContext(), "No tiene amigos agregados", Toast.LENGTH_LONG);
+                    toast.show();
+                }
             }else{
                 System.out.println("Error");
             }

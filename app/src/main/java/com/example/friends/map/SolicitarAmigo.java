@@ -78,7 +78,14 @@ public class SolicitarAmigo extends AppCompatActivity {
     public void onClickCheckUser(View view) throws ExecutionException, InterruptedException {
         showProgress(true);
         Log.d("Barra", "Mostrar barra");
-        checkUser();}
+        checkUser();
+    }
+
+    /**
+     * Comprobaciones locales de la información introducida por el usuario
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
     private void checkUser() throws InterruptedException, ExecutionException {
         String emailUsuario = email.getText().toString();
         if(emailUsuario.compareTo("") == 0) {
@@ -97,6 +104,10 @@ public class SolicitarAmigo extends AppCompatActivity {
         }
         aux = null;
     }
+
+    /**
+     * Clase para enviar la petición de amistad
+     */
     @SuppressLint("StaticFieldLeak")
     private class SolicitarAux extends AsyncTask<Void, Void, Boolean> {
 

@@ -26,12 +26,16 @@ import java.util.List;
 
 import Utils.HttpsRequest;
 
+/**
+ * Clase empleada para mostrar cada línea del listado. Esto se utiliza ya que queremos asignar botones a cada petición por separado
+ */
 public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase para poder realizar el listado de amigos con botones
     private List<String> amigos = new ArrayList<String>(); //Listado de amigos
     private Context context;
     private static String correoAmigo; //Correo que usaremos para ubicar a nuestro amigo
     private String emailPropio; //Correo personal
     private Friends friends;
+    private RemoveFriend removeFriend;
 
     public FriendsAdapter(String emailPropio, List<String> amigos, Context context){
         this.emailPropio = emailPropio;
@@ -72,8 +76,8 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
             @Override
             public void onClick(View view) {
                 correoAmigo = amigos.get(pos);
-                borrarAmigo(emailPropio);
-
+                removeFriend = new RemoveFriend(emailPropio,correoAmigo);
+                removeFriend.execute((Void) null);
             }
         });
         chat.setOnClickListener(new View.OnClickListener() {
@@ -96,9 +100,11 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
 
         return view;
     }
-    public void borrarAmigo(String emailPropio){
-        new RemoveFriend(emailPropio,correoAmigo).execute();
-    }
+
+    /**
+     * Crea la actividad donde se abre el mapa con el amigo
+     * @param emailPropio
+     */
     public void abrirMapa(String emailPropio){
         Intent intent = new Intent(context, MapsActivity.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
@@ -106,12 +112,20 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
         friends.startActivity(intent);
     }
 
+    /**
+     * Crea la actividad donde se abre el chat con el amigo
+     * @param emailPropio
+     */
     public void abrirChat(String emailPropio){
         Intent intent = new Intent(context, Chat.class);
         intent.putExtra("EMAIL", emailPropio); //Usaremos estos extras para enviar a la actividad del mapa los dos posibles correos para sus ubicaciones
         intent.putExtra("EMAIL_AMIGO", correoAmigo);
         friends.startActivity(intent);
     }
+
+    /**
+     * Clase para borrar amigo. Es necesario que se encuentre en una clase separada ya que es necesario borrarlo también en Google Sheet
+     */
     public class RemoveFriend extends AsyncTask<Void, Void, Boolean> {
 
         private String emailAmigo;
@@ -138,7 +152,9 @@ public class FriendsAdapter extends BaseAdapter implements ListAdapter {//Clase 
 
         @Override
         protected void onPostExecute(final Boolean success) {
-            //TODO actualizar pantalla
+            friends.actualizaPantalla();
+            friends.mensajePorPantalla();
+            removeFriend = null;
         }
     }
 }

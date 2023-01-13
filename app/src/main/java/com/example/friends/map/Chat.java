@@ -65,8 +65,11 @@ public class Chat extends AppCompatActivity {
     String contenidoPrevio = "";
 
 
+    /**
+     * Con esto paramos la lectura periódica cuando volvemos hacia atrás empleando el botón del móvil
+     */
     @Override
-    public void onBackPressed(){ //Con esto paramos la lectura periódica cuando volvemos hacia atrás
+    public void onBackPressed(){
         super.onBackPressed();
         handler.cancel(true);
     }
@@ -105,6 +108,12 @@ public class Chat extends AppCompatActivity {
     }
 
 
+    /**
+     * Método encargado del inicio del envio de un mensaje hacia el Google Sheet desde la pantalla
+     * @param mensaje
+     * @throws IOException
+     * @throws JSONException
+     */
     public void chat(String mensaje) throws IOException, JSONException {
 
         if (participantes.equals(null))
@@ -115,18 +124,20 @@ public class Chat extends AppCompatActivity {
         envioAux.execute((Void) null);
     }
 
+    /**
+     * Actualiza la pantalla
+     * @param texto
+     * @throws IOException
+     */
     public void actualizaPantalla(String texto) throws IOException { //La interfaz gráfica no puede ser actualizada desde un hilo trabajador, siempre del principal
         chat.setText(texto);
         chat.invalidate();
-        //progressBar.setVisibility(View.GONE);
     }
 
-    public void eliminarCargando(){
-        progressBar.setVisibility(View.GONE);
-    }
-
-
-    public class ChatManager extends AsyncTask<Void, Void, Boolean> { //Leer/Escribir localmente
+    /**
+     * Clase encargada de obtener los participantes del chat
+     */
+    public class ChatManager extends AsyncTask<Void, Void, Boolean> {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
@@ -152,7 +163,10 @@ public class Chat extends AppCompatActivity {
         }
     }
 
-    public class EnvioAux extends AsyncTask<Void, Void, Boolean>{ //Esta clase escribe hacia el exterior y guarda localmente
+    /**
+     * Clase que realiza el proceso de envio de mensajes hacia el exterior
+     */
+    public class EnvioAux extends AsyncTask<Void, Void, Boolean>{ //Esta clase escribe hacia el exterior
 
         private String mensaje;
         private String nombreFichero;
@@ -162,7 +176,7 @@ public class Chat extends AppCompatActivity {
             this.nombreFichero = nombreFichero;
         }
         @Override
-        protected Boolean doInBackground(Void... voids) { //Mando fuera y escribo local --> Leo local --> Actualizo pantalla
+        protected Boolean doInBackground(Void... voids) {
             try {
                 escrituraExterior(mensaje);
             } catch (JSONException | IOException e) {
@@ -182,14 +196,18 @@ public class Chat extends AppCompatActivity {
             HttpsRequest.writeChat(participantes.get(0), participantes.get(1), mensaje);
         }
     }
+
+    /**
+     * Clase que realiza el proceso de lectura de mensajes hacia el exterior
+     */
     public class LecturaAux extends AsyncTask<Void, Void, Boolean>{
 
         private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); //Se usará para actualizar el chat periodicamente
 
         @Override
-        protected Boolean doInBackground(Void... voids) { //Espera 10 segundos entre lectura y lectura, al cabo de 30 minutos finaliza la ejecución
+        protected Boolean doInBackground(Void... voids) { //Espera periodica entre lectura y lectura, al cabo de 10 minutos finaliza la ejecución
 
-            Runnable lect = () -> {
+            Runnable lect = () -> { //Proceso que se ejecutará en bucle, en este caso las lecturas
                 try {
                     lecturaExterior();
                 } catch (IOException | JSONException e) {
@@ -197,9 +215,9 @@ public class Chat extends AppCompatActivity {
                 }
 
             };
-            handler = scheduler.scheduleAtFixedRate(lect, 2, 2, TimeUnit.SECONDS);
-            Runnable parar = () -> handler.cancel(false);
-            scheduler.schedule(parar, 10, TimeUnit.MINUTES);
+            handler = scheduler.scheduleAtFixedRate(lect, 2, 2, TimeUnit.SECONDS); //Encargado del bucle de lectura
+            Runnable parar = () -> handler.cancel(false); //Para finalizar dicho bucle
+            scheduler.schedule(parar, 10, TimeUnit.MINUTES); //A los 10 minutos, ejecuta el Runnable parar
             return true;
         }
 
@@ -208,7 +226,7 @@ public class Chat extends AppCompatActivity {
             lecturaAux = null;
         }
 
-        public void lecturaExterior() throws IOException, JSONException { //Lee del sheet y almacena localmente
+        public void lecturaExterior() throws IOException, JSONException { //Lee del sheet
            List<Message> mensajes = HttpsRequest.getChat(participantes.get(0), participantes.get(1));
            Message mensaje = new Message();
            StringBuilder chatActual = new StringBuilder();
