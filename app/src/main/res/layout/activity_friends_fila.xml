@@ -28,7 +28,7 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:orientation="horizontal"
@@ -40,7 +40,7 @@
             <Button
                 android:id="@+id/map_friend"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:text="@string/mapa"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -48,7 +48,7 @@
             <Button
                 android:id="@+id/chat"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:text="@string/chat"
                 app:layout_constraintEnd_toStartOf="@+id/map_friend"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -56,7 +56,7 @@
             <Button
                 android:id="@+id/borrar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:text="@string/borrarAmigo"
                 app:layout_constraintEnd_toStartOf="@+id/map_friend"
                 app:layout_constraintTop_toTopOf="parent" />
