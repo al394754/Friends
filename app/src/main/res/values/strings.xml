@@ -35,4 +35,5 @@
     <string name="DeclineOption">"Decline "</string>
     <string name="AcceptOption">Accept</string>
     <string name="SendMessage">Send message</string>
+    <string name="invalid_email">Invalid email / Already existing</string>
 </resources>
