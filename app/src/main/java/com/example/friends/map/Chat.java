@@ -82,7 +82,7 @@ public class Chat extends AppCompatActivity {
 
         chat = (TextView) findViewById(R.id.chatLocal);
         chat.setMovementMethod(new ScrollingMovementMethod());
-        chat.setText("Cargando mensajes...");
+        chat.setText("Loading messages...");
         entrada = (EditText) findViewById(R.id.entrada);
         enviar = (Button) findViewById(R.id.enviar);
 
