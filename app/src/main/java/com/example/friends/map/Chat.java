@@ -239,6 +239,9 @@ public class Chat extends AppCompatActivity {
                contenidoPrevio = chatActual.toString();
                actualizaPantalla(contenidoPrevio);
            }
+           if(chatActual.length() == 0){
+               actualizaPantalla("Aún no hay mensajes en esta conversación.");
+           }
         }
     }
 
