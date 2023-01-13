@@ -392,6 +392,8 @@ public class HttpsRequest {
         httpRequest.createPOSTRequest(parameters);
         String JsonString = httpRequest.getResponse();
         JSONObject object = new JSONObject(JsonString);
+        token= token.replaceAll("(\n|\r)", "");
+        token = object.getString("Token");
         return object.getBoolean("ValidRegister");
     }
 
