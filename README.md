@@ -3,7 +3,7 @@
 Enlace a la googlesheet de "Where are my friends": https://docs.google.com/spreadsheets/d/14NQcZjZgBxY-fFTvHrJZDMDzcxFb1b5xURdAjeSLgeM/edit#gid=0
 
 Distribución trabajo resumidamente:   
-  -Alex: Parte Fronted(Pantallas de la aplicación menos login y register, más interacción con API Google Maps)
+  -Alex: Parte Fronted(Pantallas de la aplicación menos login y register, más interacción con API Google Maps)\n
   -Adrián: Parte backend(Toda la gestión del google spreadsheet + métodos de comunicación HTTP de la carpeta del proyecto Utils) y Parte Fronted (Pantallas Login y Register)
 
 Código de google script:
