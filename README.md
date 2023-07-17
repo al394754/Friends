@@ -1,5 +1,7 @@
 # Where are my Friends?
 
+Aplicación Android que simula el funcionamiento de Google Maps, muestra la ubicación del usuario, de otro usuario que tenga agregado como amigo y permite comunicarse con el mismo a través de funcionalidad de mensajería instantánea
+
 Enlace a la googlesheet de "Where are my friends": https://docs.google.com/spreadsheets/d/14NQcZjZgBxY-fFTvHrJZDMDzcxFb1b5xURdAjeSLgeM/edit#gid=0
 
 Distribución trabajo resumidamente:   
